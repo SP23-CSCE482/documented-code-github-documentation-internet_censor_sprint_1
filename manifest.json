@@ -1,0 +1,6 @@
+{
+    "manifest_version": 3,
+    "name": "Safe Internet Coalition Extension",
+    "description": "Extension for content filtering",
+    "version": "0.0.1"
+}
