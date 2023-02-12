@@ -1,0 +1,27 @@
+{
+  "name": "github-setup-internet_censor_sprint_1",
+  "version": "1.0.0",
+  "description": "Browser extension for content filtering",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1/issues"
+  },
+  "homepage": "https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1#readme",
+  "devDependencies": {
+    "jest": "^29.4.2",
+    "puppeteer": "^19.6.3"
+  }
+}
