@@ -1,8 +1,9 @@
+require('dotenv').config();
 const puppeteer = require('puppeteer');
 
 (async () => {
     // Path to extension folder
-    const paths = 'C:/Users/jonat/Documents/csce431/github-setup-internet_censor_sprint_1/src';
+    const paths = process.env._PATH;
     try {
         console.log('==>Open Browser');
         const browser = await puppeteer.launch({

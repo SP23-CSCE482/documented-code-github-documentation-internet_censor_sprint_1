@@ -1,6 +1,7 @@
+require('dotenv').config();
 const puppeteer = require('puppeteer');
 let browser; let page;
-const path = 'C:/Users/jonat/Documents/csce431/github-setup-internet_censor_sprint_1/src';
+const path = process.env._PATH;
 const puppeteerArgs = [
   `--disable-extensions-except=${path}`,
   `--load-extension=${path}`,
