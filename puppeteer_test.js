@@ -16,30 +16,6 @@ const puppeteer = require('puppeteer');
                 ]
         });
 
-        console.log('==>Navigate to Extension');
-        const page = await browser.newPage();
-
-        // Name of the extension
-        const extensionName = 'SIC Internet Censor';
-
-        // Find the extension
-        const targets = await browser.targets();
-        const extensionTarget = targets.find(({ _targetInfo }) => {
-            return _targetInfo.title === extensionName && _targetInfo.type === 'background_page';
-        });
-
-        // Extract the URL
-        const extensionURL = extensionTarget._targetInfo.url;
-        console.log("\nExtracted URL ==>" + extensionURL);
-        const urlSplit = extensionURL.split('/');
-        console.log("Split URL ==>");
-        console.log(urlSplit);
-        const extensionID = urlSplit[2];
-        console.log("Extension ID ==>" + extensionID +"\n");
-
-        // Define the extension page
-        const extensionEndURL = 'popup.html';
-
         // Navigate to extension page
         await page.goto('https://google.com');
         // Take a screenshot of the extension page
