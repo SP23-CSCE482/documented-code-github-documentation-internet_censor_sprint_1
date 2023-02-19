@@ -1,9 +1,7 @@
-import path from 'path';
 require('dotenv').config();
 const puppeteer = require('puppeteer');
 let browser; let page;
-//const path = process.env._PATH;
-const pathToExtension = path.join(process.cwd(), 'src');
+const path = process.env._PATH;
 const puppeteerArgs = [
   `--disable-extensions-except=${pathToExtension}`,
   `--load-extension=${pathToExtension}`,
