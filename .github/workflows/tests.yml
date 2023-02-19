@@ -5,24 +5,16 @@ jobs:
     name: Install Dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Install Dependencies
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - run: npm install yarn --global
-      - name: Install Yarn
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - run: yarn
-      - name: Yarn install
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - name: Test Code
-        uses: mujo-code/puppeteer-headful@master
+        uses: actions/setup-node@v2
         env:
-          CI: 'true'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
         with:
-          args: yarn test:ci
+          args: install
+      - name: Test Code
+        uses: mujo-code/puppeteer-headful@16.6.0
+        env:
+          CI: "true"
+        with:
+          args: npm test
