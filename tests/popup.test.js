@@ -11,7 +11,7 @@ const puppeteerArgs = [
 describe('SIC Extensions', () => {
   beforeEach(async function() {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 200,
       args: puppeteerArgs,
     });
