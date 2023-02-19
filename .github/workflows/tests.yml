@@ -17,4 +17,4 @@ jobs:
         env:
           CI: "true"
         with:
-          args: npm test
+          args: sudo npm test
