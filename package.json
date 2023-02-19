@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "sudo jest"
+    "test": "npm install && jest"
   },
   "repository": {
     "type": "git",
