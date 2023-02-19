@@ -3,8 +3,8 @@ const puppeteer = require('puppeteer');
 let browser; let page;
 const path = process.env._PATH;
 const puppeteerArgs = [
-  `--disable-extensions-except=${pathToExtension}`,
-  `--load-extension=${pathToExtension}`,
+  `--disable-extensions-except=${path}`,
+  `--load-extension=${path}`,
   '--disable-features=DialMediaRouteProvider',
 ];
 
