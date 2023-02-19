@@ -11,7 +11,9 @@ const puppeteerArgs = [
 describe('SIC Extensions', () => {
   beforeEach(async function() {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
+      args: ['--no-sandbox'],
+      executablePath: process.env.PUPPETEER_EXEC_PATH, // set by docker container
       slowMo: 200,
       args: puppeteerArgs,
     });
