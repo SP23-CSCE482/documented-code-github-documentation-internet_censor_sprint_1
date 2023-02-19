@@ -2,9 +2,10 @@ require('dotenv').config();
 const puppeteer = require('puppeteer');
 let browser; let page;
 const path = process.env._PATH;
+const pathToExtension = path.join(process.cwd(), 'src');
 const puppeteerArgs = [
-  `--disable-extensions-except=${path}`,
-  `--load-extension=${path}`,
+  `--disable-extensions-except=${pathToExtension}`,
+  `--load-extension=${pathToExtension}`,
   '--disable-features=DialMediaRouteProvider',
 ];
 
