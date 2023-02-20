@@ -15,3 +15,9 @@ jobs:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
       - name: Linter
         run: npm run lint
+      - name: End-to-end tests
+        uses: mujo-code/puppeteer-headful@master
+        env:
+          CI: 'true'
+        with:
+          args: npm run test
