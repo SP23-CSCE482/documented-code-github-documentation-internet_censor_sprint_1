@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "lint": "eslint --ext .js",
+    "lint": "eslint --ext ./src .js, .css, .html",
     "test": "npm install && jest"
   },
   "repository": {
