@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "lint": "eslint --ignore-path --fix .gitignore --ext .js .",
+    "lint": "eslint --ignore-path .gitignore --fix --ext .js .",
     "test": "jest"
   },
   "repository": {

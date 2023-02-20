@@ -15,9 +15,12 @@ jobs:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
       - name: Linter
         run: npm run lint
-      - name: End-to-end tests
-        uses: mujo-code/puppeteer-headful@master
+      - name: Perform e2e tests with Heaful Puppeteer
+        uses: maufrontier/puppeteer-headful@v3
         env:
           CI: 'true'
         with:
-          args: npm run test
+          commands: |
+            npx http-server ./public &
+            sleep 10
+            npm run test
