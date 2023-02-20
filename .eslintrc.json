@@ -12,6 +12,7 @@
     },
     "rules": {
         "no-unused-vars": "warn",
-        "max-len": "warn"
+        "max-len": "warn",
+        "camelcase": "warn"
     }
 }
