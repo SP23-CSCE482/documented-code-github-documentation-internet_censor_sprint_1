@@ -32,9 +32,9 @@ describe('Test browser extension', () => {
 
 		// (Assuming your content page contains <h1>Extension popup</h1>)
 		// The user should see the heading on the popup
-		const heading = await extensionPage.$('h2');
+		const heading = await extensionPage.$('span');
 		const extensionHeadingText = await heading.evaluate((e) => e.innerText);
-		expect(extensionHeadingText).toEqual('SIC Extension');
+		expect(extensionHeadingText).toEqual('Safe Internet');
 	});
 
 	afterAll(async () => {
