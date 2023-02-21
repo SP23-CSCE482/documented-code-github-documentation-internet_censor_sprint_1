@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "action": {
     "default_title": "Click to open extension popup",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/index.html"
   },
   "permissions": [
     "activeTab"
