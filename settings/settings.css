@@ -1,0 +1,81 @@
+body {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-weight: 500;
+    padding: 2rem;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 700;
+    line-height: 1.1;
+    margin-top: 0;
+}
+
+h1 {
+    font-size: 30px;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.2rem;
+}
+
+.horizontal-form-row input {
+    border: none;
+    margin-right: 10px;
+    background: rgb(236, 236, 236);
+    font-weight: 500;
+    flex: 2;
+    box-shadow: none;
+    font-size: 16px;
+}
+
+.horizontal-form-row button {
+    font-weight: 600;
+    border: none;
+    background: rgb(236, 236, 236);
+    color: #252525;
+}
+
+.horizontal-form-row {
+    display: flex;
+}
+
+.word-item {
+    display: flex;
+    width: 500px;
+    align-items: stretch;
+}
+
+.word-item div {
+    padding: 10px;
+    display: inline;
+    margin: 0 10px;
+    flex: 2;
+    background-color: rgb(236, 236, 236);
+    border-radius: 0.5rem;
+}
+
+.word-item button {
+    border-radius: 0.5rem;
+}
+
+.container-words {
+    margin-bottom: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.container-words span {
+    background-color: rgb(236, 236, 236);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 7px;
+    padding: 8px 15px;
+    width: 100%;
+}
