@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
+    "html-to-text": "^9.0.4",
     "puppeteer-test-browser-extension": "^1.2.2"
   }
 }
