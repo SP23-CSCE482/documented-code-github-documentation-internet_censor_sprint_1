@@ -20,14 +20,6 @@ jobs:
       - name: CSS linter
         run: npm run css-lint
 
-      - name: Setup directory structure for popup test
-        run: |
-          cp -r popup/ tests/
-          cp -r settings/ tests/popup/
-          cp background.js manifest.json tests/popup/
-          mv tests/popup/popup.html tests/popup/index.html
-        shell: bash
-
       - name: Perform e2e tests with Heaful Puppeteer
         uses: maufrontier/puppeteer-headful@v3
         env:

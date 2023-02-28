@@ -30,10 +30,44 @@ function hideSection(element) {
  * @param {string} word - the word to add
  */
 function addWordToDisplay(word) {
-  const element = document.createElement('span');
-  element.innerText = word;
-  topicsList.appendChild(element);
+  const containerElement = document.createElement('div');
+  const wordElement = document.createElement('div');
+  const removeIconContainerElement = document.createElement('div');
+
+  wordElement.innerText = word;
+  containerElement.classList.add('word-container');
+
+  removeIconContainerElement.classList.add('remove-icon-container');
+
+  // create trash icon
+  const removeIconElement = document.createElement('i');
+  removeIconElement.classList.add('bi', 'bi-trash-fill');
+
+  // delete element when trash icon is clicked
+  removeIconElement.addEventListener('click', (e) => {
+    const elementToDelete=e.target.parentElement.parentElement;
+    removeWordFromDisplay(elementToDelete);
+  });
+
+  // add icon to div container
+  removeIconContainerElement.appendChild(removeIconElement);
+
+  // add both containers to main container
+  containerElement.appendChild(wordElement);
+  containerElement.appendChild(removeIconContainerElement);
+
+  // add assembled element to document
+  topicsList.prepend(containerElement);
+
   console.debug('Added topics list display:', word);
+}
+
+/**
+ * Removes a word from the display list.
+ * @param {HTMLElement} element - element that contains the word to remove
+ */
+function removeWordFromDisplay(element) {
+  element.remove();
 }
 
 /**
@@ -50,7 +84,7 @@ function sendListToBackend() {
     if (response.status == 'ok') {
       hideSection(getElementFromId('section-choice'));
       hideSection(getElementFromId('section-welcome'));
-      showSection(getElementFromId('section-enabled'));
+      showSection(getElementFromId('section-controls'));
     } else {
       console.error('Extension did not acknowledge message');
     }
@@ -73,6 +107,7 @@ restrictedWords.forEach((word) => {
 getElementFromId('button-continue-setup').addEventListener('click', () => {
   hideSection(getElementFromId('section-welcome'));
   showSection(getElementFromId('section-choice'));
+  getElementFromId('section-choice-input').focus();
 });
 
 // 'Use defaults' button completes setup
@@ -91,6 +126,22 @@ getElementFromId('button-finish-setup').addEventListener('click', () => {
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
   addWordToDisplay(inputValue);
-  restrictedWords.push(inputValue);
+  restrictedWords.unshift(inputValue);
   getElementFromId('section-choice-input').value = '';
+});
+
+// make enter key add item to list
+getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
+  if (e.key=='Enter') {
+    const inputValue = getElementFromId('section-choice-input').value;
+    addWordToDisplay(inputValue);
+    restrictedWords.unshift(inputValue);
+    getElementFromId('section-choice-input').value = '';
+  }
+});
+
+// 'Open settings' button on controls page
+getElementFromId('button-open-settings').addEventListener('click', () => {
+  console.debug('User clicked open settings button');
+  chrome.runtime.openOptionsPage(()=>{});
 });

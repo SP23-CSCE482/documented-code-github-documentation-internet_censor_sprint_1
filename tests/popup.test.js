@@ -7,7 +7,7 @@ describe('Test browser extension', () => {
 
   beforeAll(async () => {
     const extensionEnvironment = await bootstrapExtension({
-      pathToExtension: path.resolve('./tests/popup', ''),
+      pathToExtension: path.resolve('./popup', ''),
       contentUrl: 'https://google.com/',
     });
 

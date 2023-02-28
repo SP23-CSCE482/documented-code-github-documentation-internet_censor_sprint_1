@@ -1,4 +1,8 @@
 /* General styles and overrides */
+:root {
+    --light-background: #efefef;
+}
+
 body {
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     font-weight: 500;
@@ -7,17 +11,20 @@ body {
     justify-content: center;
     height: 485px;
     width: 350px;
+    max-height: 485px;
+    max-width: 350px;
 }
 
 main {
     padding: 2rem;
+    width: 100%;
 }
 
-main section {
+main > section {
     display: none;
 }
 
-main section:first-of-type {
+main > section:first-of-type {
     display: block;
 }
 
@@ -28,24 +35,29 @@ main section:first-of-type {
     width: 100%;
     padding-top: 9px;
     padding-bottom: 9px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
-span.statement-gradient {
+.statement-gradient {
     background: linear-gradient(30deg, #1763d4, #30a6f0);
-    background-clip: border-box;
+    background-clip: text;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: transparent;
     white-space: nowrap;
 }
 
-h1 {
-    font-weight: 900;
+section h1 {
+    font-weight: 600;
     line-height: 1.1;
     font-size: 30px;
     margin-top: 0;
 }
 
+section p {
+    color: #808080;
+    line-height: 1.4;
+}
 
 /* section: welcome */
 #section-welcome .button-vertical-group {
@@ -56,27 +68,40 @@ h1 {
     margin-top: 20px;
 }
 
-#section-welcome .button-vertical-group button:last-child {
-    background-color: #dfdfdf;
+#section-welcome .button-vertical-group > button + button {
+    background-color: transparent;
+    font-weight: 600;
+    display: block;
+    width: 100%;
 }
 
-
 /* section: input word choices */
-#section-choice .horizontal-form-row input {
+#section-choice .horizontal-form-row > input {
     border: none;
     margin-right: 10px;
-    background: rgb(236, 236, 236);
+    background-color: var(--light-background);
     font-weight: 500;
     flex: 2;
     box-shadow: none;
     font-size: 16px;
+    padding: 8px 15px;
 }
 
-#section-choice .horizontal-form-row button {
+#section-choice .horizontal-form-row > button:last-child {
     font-weight: 600;
     border: none;
-    background: rgb(236, 236, 236);
-    color: #252525;
+    padding: 0;
+    border-radius: 100%;
+}
+
+#section-choice .horizontal-form-row > button > span {
+    width: 40px;
+    line-height: 1;
+    display: block;
+    font-size: 25px;
+    font-weight: 400;
+    position: relative;
+    top: -2px;
 }
 
 #section-choice .horizontal-form-row {
@@ -88,29 +113,40 @@ h1 {
     margin-top: 30px;
 }
 
-#section-choice .container-words {
+#section-choice > .container-words {
     margin-bottom: 10px;
     margin-top: 20px;
     max-height: 200px;
     overflow-y: auto;
 }
 
-#section-choice .container-words span {
-    background-color: rgb(236, 236, 236);
+#section-choice > .container-words > .word-container {
+    background-color: var(--light-background);
     border-radius: 0.5rem;
-    cursor: pointer;
-    display: block;
     margin-bottom: 7px;
     padding: 8px 15px;
     width: 100%;
+    color: black;
+    display: flex;
+    justify-items: stretch;
+    justify-content: space-between;
+    cursor: default;
 }
 
-
-/* section: setup complete */
-#section-enabled {
-    padding: 20px 0;
+#section-choice > .container-words > .word-container > .remove-icon-container > i {
+    cursor: pointer;
+    color: #b2b2b2;
+    transition: color 0.1s linear;
 }
 
-#section-enabled h1 {
-    margin-bottom: 10px;
+#section-choice > .container-words > .word-container > .remove-icon-container > i:hover {
+    color: #313131;
+}
+
+/* section: controls */
+#section-controls p:not(:first-of-type) {
+    font-size: 13px;
+    line-height: 1.2;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
