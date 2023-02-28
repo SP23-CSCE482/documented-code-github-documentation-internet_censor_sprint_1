@@ -1,17 +1,16 @@
 {
-    "manifest_version": 3,
-    "name": "SIC Internet Censor",
-    "description": "Censors text based on user filters",
-    "version": "1.0",
-    "permissions": ["tabs", "scripting"],
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "content_security_policy": {
-      "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'"
-    },
-    "background": {
-      "service_worker": "background.js"
-    },
-    "host_permissions": ["http://*/", "https://*/"]
+  "manifest_version": 3,
+  "name": "Safe Internet Coalition Extension",
+  "description": "Extension for content filtering",
+  "version": "0.0.1",
+  "action": {
+    "default_title": "Click to open extension popup",
+    "default_popup": "popup/index.html"
+  },
+  "permissions": [
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "background.js"
   }
+}
