@@ -2,12 +2,13 @@ body {
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     font-weight: 500;
     padding: 2rem;
+    margin: 0;
 }
 
 h1,
 h2,
 h3 {
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.1;
     margin-top: 0;
 }
@@ -64,18 +65,38 @@ h3 {
     border-radius: 0.5rem;
 }
 
+:root {
+    --light-background: rgb(239, 239, 239);
+}
+
 .container-words {
     margin-bottom: 10px;
+    margin-top: 10px;
     max-height: 200px;
     overflow-y: auto;
 }
 
-.container-words span {
-    background-color: rgb(236, 236, 236);
+.container-words .word-container {
+    background-color: var(--light-background);
     border-radius: 0.5rem;
-    cursor: pointer;
     display: block;
     margin-bottom: 7px;
     padding: 8px 15px;
     width: 100%;
+    color: black;
+    display: flex;
+    justify-items: stretch;
+    justify-content: space-between;
+    cursor: default;
+
+}
+
+.container-words .word-container .remove-icon-container i {
+    cursor: pointer;
+    color: #b2b2b2;
+    transition: color 0.1s linear;
+}
+
+.container-words .word-container .remove-icon-container i:hover {
+    color: #313131;
 }
