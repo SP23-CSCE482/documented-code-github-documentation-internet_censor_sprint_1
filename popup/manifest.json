@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "SIC Internet Censor",
+    "description": "Censors text based on user filters",
+    "version": "1.0",
+    "permissions": ["tabs", "scripting"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "host_permissions": ["http://*/", "https://*/"]
+  }
