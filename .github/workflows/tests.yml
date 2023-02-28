@@ -13,8 +13,13 @@ jobs:
         run: npm ci
         env:
           PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
-      - name: Linter
+
+      - name: Javascript linter
         run: npm run lint
+
+      - name: CSS linter
+        run: npm run css-lint
+
       - name: Perform e2e tests with Heaful Puppeteer
         uses: maufrontier/puppeteer-headful@v3
         env:
