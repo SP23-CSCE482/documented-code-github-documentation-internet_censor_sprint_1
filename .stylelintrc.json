@@ -1,3 +1,11 @@
 {
-    "extends": "stylelint-config-standard"
+    "extends": "stylelint-config-standard",
+    "rules": {
+        "indentation": null,
+        "no-missing-end-of-source-newline": null,
+        "max-line-length": null,
+        "color-function-notation": null,
+        "declaration-block-no-duplicate-properties": null,
+        "block-closing-brace-empty-line-before": null
+    }
 }
