@@ -32,11 +32,11 @@ Open up an instance of chrome. Open up the manage extension page `Extensions pop
 
 Run the following code in your respective terminal to run the test cases:
 
-'npm test'
+`npm test`
 
 To run the linter, run this command:
 
-'npm lint'
+`npm lint`
 
 ## CI/CD
 
