@@ -6,6 +6,9 @@
         "max-line-length": null,
         "color-function-notation": null,
         "declaration-block-no-duplicate-properties": null,
-        "block-closing-brace-empty-line-before": null
+        "block-closing-brace-empty-line-before": null,
+        "property-no-vendor-prefix": null,
+        "max-empty-lines": null,
+        "no-descending-specificity": null
     }
 }
