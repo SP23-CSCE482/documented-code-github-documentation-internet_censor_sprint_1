@@ -47,6 +47,8 @@ function addWordToDisplay(word) {
   removeIconElement.addEventListener('click', (e) => {
     const elementToDelete=e.target.parentElement.parentElement;
     removeWordFromDisplay(elementToDelete);
+    //remove word from list
+    removeWordFromArray(word);
   });
 
   // add icon to div container
@@ -70,6 +72,23 @@ function removeWordFromDisplay(element) {
   element.remove();
 }
 
+
+/**
+ * Removes restricted word from array
+ */
+function removeWordFromArray(word){
+  const index = restrictedWords.indexOf(word);
+  console.log('Index value:', index);
+  restrictedWords.splice(index, 1);
+
+  // save updated restrictedWords array to Chrome storage
+  chrome.storage.local.set({restrictedWords}, function() {
+    console.log('Updated restricted words:', restrictedWords);
+  });
+}
+
+
+
 /**
  * Sends a message to the extension with the list of topics the user chose.
  */
@@ -92,8 +111,10 @@ function sendListToBackend() {
 }
 
 // example restricted words
-const restrictedWords = ['violence', 'segmentation fault', 'pain'];
-console.info('Initial sensitive topics', restrictedWords);
+const restrictedWords = ['violencez', 'segmentation fault', 'pain'];
+chrome.storage.local.set({restrictedWords}, function() {
+  console.log('Initial sensitive topicsm', restrictedWords);
+});
 
 // element that represents the list of topics
 const topicsList = document.getElementsByClassName('container-words')[0];
