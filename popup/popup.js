@@ -84,14 +84,15 @@ function removeWordFromArray(word) {
 
   // save updated restrictedWords array to Chrome storage
   updateRestrictedWordsInStorage();
-  
+
   logRestrictedWords();
 }
 
 
-/*
+/**
 *For debugging purposes, shows log of restrictedWords array
-*/
+*@param {array} result - returns coontents of chrome storage variable
+**/
 function logRestrictedWords() {
   chrome.storage.local.get(['restrictedWords'], function(result) {
     console.log('Updated restricted words:', result.restrictedWords);
@@ -99,14 +100,15 @@ function logRestrictedWords() {
 }
 
 
-
-// sets the restrictedWords array in the Chrome storage to the current value of the restrictedWords variable in your extension code
+/**
+*sets the restrictedWords array in the Chrome storage to the current value
+* @param {array} restrictedWords - array of words
+*/
 function updateRestrictedWordsInStorage() {
-  chrome.storage.local.set({ restrictedWords: restrictedWords }, function() {
+  chrome.storage.local.set({restrictedWords: restrictedWords}, function() {
     console.log('Updated restricted words in storage:', restrictedWords);
   });
 }
-
 
 
 /**
