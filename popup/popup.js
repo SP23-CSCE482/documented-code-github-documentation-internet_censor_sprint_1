@@ -133,7 +133,7 @@ function sendListToBackend() {
 }
 
 // example restricted words
-const restrictedWords = ['violencez', 'segmentation fault', 'pain'];
+const restrictedWords = ['violence', 'segmentation fault', /*'pain'*/];
 chrome.storage.local.set({restrictedWords}, function() {
   console.log('Initial sensitive topicsm', restrictedWords);
 });
