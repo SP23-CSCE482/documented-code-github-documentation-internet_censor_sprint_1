@@ -47,6 +47,8 @@ function addWordToDisplay(word) {
   removeIconElement.addEventListener('click', (e) => {
     const elementToDelete=e.target.parentElement.parentElement;
     removeWordFromDisplay(elementToDelete);
+    // remove word from list
+    removeWordFromArray(word);
   });
 
   // add icon to div container
@@ -70,6 +72,45 @@ function removeWordFromDisplay(element) {
   element.remove();
 }
 
+
+/**
+ * Removes restricted word from array
+ * @param {string} word - the word to add
+ */
+function removeWordFromArray(word) {
+  const index = restrictedWords.indexOf(word);
+  console.log('Index value:', index);
+  restrictedWords.splice(index, 1);
+
+  // save updated restrictedWords array to Chrome storage
+  updateRestrictedWordsInStorage();
+
+  logRestrictedWords();
+}
+
+
+/**
+*For debugging purposes, shows log of restrictedWords array
+*@param {array} result - returns coontents of chrome storage variable
+**/
+function logRestrictedWords() {
+  chrome.storage.local.get(['restrictedWords'], function(result) {
+    console.log('Updated restricted words:', result.restrictedWords);
+  });
+}
+
+
+/**
+*sets the restrictedWords array in the Chrome storage to the current value
+* @param {array} restrictedWords - array of words
+*/
+function updateRestrictedWordsInStorage() {
+  chrome.storage.local.set({restrictedWords: restrictedWords}, function() {
+    console.log('Updated restricted words in storage:', restrictedWords);
+  });
+}
+
+
 /**
  * Sends a message to the extension with the list of topics the user chose.
  */
@@ -92,8 +133,10 @@ function sendListToBackend() {
 }
 
 // example restricted words
-const restrictedWords = ['violence', 'segmentation fault', 'pain'];
-console.info('Initial sensitive topics', restrictedWords);
+const restrictedWords = ['violence', 'segmentation fault', /*'pain'*/];
+chrome.storage.local.set({restrictedWords}, function() {
+  console.log('Initial sensitive topicsm', restrictedWords);
+});
 
 // element that represents the list of topics
 const topicsList = document.getElementsByClassName('container-words')[0];
@@ -127,6 +170,7 @@ getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
   addWordToDisplay(inputValue);
   restrictedWords.unshift(inputValue);
+  updateRestrictedWordsInStorage();
   getElementFromId('section-choice-input').value = '';
 });
 
@@ -136,6 +180,8 @@ getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
     const inputValue = getElementFromId('section-choice-input').value;
     addWordToDisplay(inputValue);
     restrictedWords.unshift(inputValue);
+    updateRestrictedWordsInStorage();
+    console.debug('Initial sensitive topicsm', restrictedWords);
     getElementFromId('section-choice-input').value = '';
   }
 });
