@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Include full bootstrap css for now. When the extension is almost done, we can keep only the parts of bootstrap that we use and further minify. -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+  <!-- import icons from bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+  <!-- imports from google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- stylesheet for popup -->
+  <link rel="stylesheet" href="./popup.css" />
+</head>
+
+<body>
+  <main>
+    <!-- section: shows welcome info and setup button -->
+    <section id="section-welcome">
+      <h1>Welcome to the <span class="statement-gradient">Safe Internet</span> Coalition.</h1>
+      <p>SIC provides an extension to hide sensitive topics as you browse.</p>
+      <p>It works seamlessly in the background to dynamically remove unwanted topics from pages.</p>
+      <div class="button-vertical-group">
+        <button type="button" class="block-btn btn btn-primary" id="button-continue-setup">Set up custom topics</button>
+        <button type="button" class="btn" id="button-default-setup">Or use the defaults</button>
+      </div>
+    </section>
+
+    <!-- section: lets the user pick initial topics -->
+    <section id="section-choice">
+      <h1>Add topics</h1>
+      <p>These topics will be dynamically removed from pages as you browse.</p>
+      <div class="container-words"></div>
+      <div class="horizontal-form-row">
+        <input type="text" class="form-control" id="section-choice-input" placeholder="Enter a topic">
+        <button type="button" class="btn btn-primary" id="button-add-word"><span>+</span></button>
+      </div>
+      <button type="button" class="block-btn btn btn-primary" id="button-finish-setup">Finish setup</button>
+    </section>
+
+    <!-- section: main controls after setup -->
+    <section id="section-controls">
+      <h1>Controls</h1>
+      <p style="margin-bottom: 20px;">Configure SIC to your liking.</p>
+      <button type="button" class="block-btn btn btn-danger" id="button-toggle-active">Disable fitering</button>
+      <p>Controls whether filtering is active. Disabling the filter always shows the original content.</p>
+      <button type="button" class="block-btn btn btn-primary" id="button-open-settings">Open settings <i style="margin-left:5px;" class="bi bi-box-arrow-up-right"></i></button>
+      <p>Opens SIC's global settings. You can add and remove sensitive topics here.</p>
+    </section>
+
+    <!-- end of all sections -->
+  </main>
+
+  <!-- popup-specific js -->
+  <script src="./popup.js"></script>
+</body>
+
+</html>
