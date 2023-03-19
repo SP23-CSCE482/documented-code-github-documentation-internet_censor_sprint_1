@@ -1,12 +1,12 @@
 const WORDS_KEY = 'keywords';
-var wordsObj = {};
+let wordsObj = {};
 
 // example restricted words
 chrome.storage.local.get(WORDS_KEY).then((result) => {
   wordsObj = result.keywords;
   console.log(wordsObj);
   const wordArray = Object.keys(wordsObj);
-  wordArray.forEach(element => addWordToDisplay(element))
+  wordArray.forEach((element) => addWordToDisplay(element));
 });
 
 // element that represents the list of topics
