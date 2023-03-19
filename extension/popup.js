@@ -1,3 +1,17 @@
+const WORDS_KEY = 'keywords';
+var wordsObj = {};
+
+// example restricted words
+chrome.storage.local.get(WORDS_KEY).then((result) => {
+  wordsObj = result.keywords;
+  console.log(wordsObj);
+  const wordArray = Object.keys(wordsObj);
+  wordArray.forEach(element => addWordToDisplay(element))
+});
+
+// element that represents the list of topics
+const topicsList = document.getElementsByClassName('container-words')[0];
+
 /**
  * Returns the element representation of the id.
  * @param {string} elementId
@@ -39,6 +53,27 @@ function addWordToDisplay(word) {
 
   removeIconContainerElement.classList.add('remove-icon-container');
 
+  // create toggle icon
+  const toggleElement = document.createElement('i');
+  toggleElement.classList.add('bi');
+  if (wordsObj[word] == true) {
+    toggleElement.classList.add('bi-toggle-on');
+  } else {
+    toggleElement.classList.add('bi-toggle-off');
+  }
+
+  // delete element when trash icon is clicked
+  toggleElement.addEventListener('click', (e) => {
+    // flip state
+    toggleElement.classList.toggle('bi-toggle-on');
+    toggleElement.classList.toggle('bi-toggle-off');
+    // save toggle flip
+    toggleWordFromObj(word);
+  });
+
+  // add icon to div container
+  removeIconContainerElement.appendChild(toggleElement);
+
   // create trash icon
   const removeIconElement = document.createElement('i');
   removeIconElement.classList.add('bi', 'bi-trash-fill');
@@ -48,7 +83,7 @@ function addWordToDisplay(word) {
     const elementToDelete=e.target.parentElement.parentElement;
     removeWordFromDisplay(elementToDelete);
     // remove word from list
-    removeWordFromArray(word);
+    removeWordFromObj(word);
   });
 
   // add icon to div container
@@ -72,44 +107,57 @@ function removeWordFromDisplay(element) {
   element.remove();
 }
 
-
 /**
- * Removes restricted word from array
- * @param {string} word - the word to add
+ * Removes restricted word from storage
+ * @param {string} word - the word to remove
  */
-function removeWordFromArray(word) {
-  const index = restrictedWords.indexOf(word);
-  console.log('Index value:', index);
-  restrictedWords.splice(index, 1);
+function removeWordFromObj(word) {
+  delete wordsObj[word];
 
-  // save updated restrictedWords array to Chrome storage
-  updateRestrictedWordsInStorage();
+  // save updated obj to Chrome storage
+  chrome.storage.local.set({keywords: wordsObj});
 
   logRestrictedWords();
 }
 
+/**
+ * Saves restricted word to storage
+ * @param {string} word - the word to add
+ */
+function saveWordToObj(word) {
+  wordsObj[word] = true;
+
+  // save updated obj to Chrome storage
+  chrome.storage.local.set({keywords: wordsObj});
+
+  logRestrictedWords();
+}
 
 /**
-*For debugging purposes, shows log of restrictedWords array
+ * Toggles word from storage
+ * @param {string} word - the word to toggle
+ */
+function toggleWordFromObj(word) {
+  wordsObj[word] = !wordsObj[word];
+
+  // save updated obj to Chrome storage
+  chrome.storage.local.set({keywords: wordsObj});
+
+  logRestrictedWords();
+}
+
+/**
+*For debugging purposes, shows all keys
 *@param {array} result - returns coontents of chrome storage variable
 **/
 function logRestrictedWords() {
-  chrome.storage.local.get(['restrictedWords'], function(result) {
-    console.log('Updated restricted words:', result.restrictedWords);
+  chrome.storage.local.get(WORDS_KEY).then((result) => {
+    wordsObj = result.keywords;
+    console.log(wordsObj);
+    const wordArray = Object.keys(wordsObj);
+    console.log(wordArray);
   });
 }
-
-
-/**
-*sets the restrictedWords array in the Chrome storage to the current value
-* @param {array} restrictedWords - array of words
-*/
-function updateRestrictedWordsInStorage() {
-  chrome.storage.local.set({restrictedWords: restrictedWords}, function() {
-    console.log('Updated restricted words in storage:', restrictedWords);
-  });
-}
-
 
 /**
  * Sends a message to the extension with the list of topics the user chose.
@@ -119,7 +167,7 @@ function sendListToBackend() {
   (async () => {
     const response = await chrome.runtime.sendMessage({
       msg_type: 'first_save_topics',
-      msg_content: {list: restrictedWords},
+      msg_content: {list: 'test'},
     });
     console.debug('Popup recieved acknowledgement', response);
     if (response.status == 'ok') {
@@ -131,20 +179,6 @@ function sendListToBackend() {
     }
   })();
 }
-
-// example restricted words
-const restrictedWords = ['violence', 'segmentation fault', /*'pain'*/];
-chrome.storage.local.set({restrictedWords}, function() {
-  console.log('Initial sensitive topicsm', restrictedWords);
-});
-
-// element that represents the list of topics
-const topicsList = document.getElementsByClassName('container-words')[0];
-
-// add all words to display element
-restrictedWords.forEach((word) => {
-  addWordToDisplay(word);
-});
 
 // 'Set up custom topics' button shows the topic list screen
 getElementFromId('button-continue-setup').addEventListener('click', () => {
@@ -169,8 +203,7 @@ getElementFromId('button-finish-setup').addEventListener('click', () => {
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
   addWordToDisplay(inputValue);
-  restrictedWords.unshift(inputValue);
-  updateRestrictedWordsInStorage();
+  saveWordToObj(inputValue);
   getElementFromId('section-choice-input').value = '';
 });
 
@@ -179,15 +212,14 @@ getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
   if (e.key=='Enter') {
     const inputValue = getElementFromId('section-choice-input').value;
     addWordToDisplay(inputValue);
-    restrictedWords.unshift(inputValue);
-    updateRestrictedWordsInStorage();
-    console.debug('Initial sensitive topicsm', restrictedWords);
+    saveWordToObj(inputValue);
     getElementFromId('section-choice-input').value = '';
   }
 });
 
 // 'Open settings' button on controls page
 getElementFromId('button-open-settings').addEventListener('click', () => {
-  console.debug('User clicked open settings button');
-  chrome.runtime.openOptionsPage(()=>{});
+  hideSection(getElementFromId('section-controls'));
+  showSection(getElementFromId('section-choice'));
+  getElementFromId('section-choice-input').focus();
 });
