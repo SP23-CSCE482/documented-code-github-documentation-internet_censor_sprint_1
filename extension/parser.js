@@ -1,7 +1,7 @@
-const {htmlToText} = require('html-to-text');
+const { htmlToText } = require('html-to-text');
 
 // Parses html page string
-// Input:
+// Input: 
 // page -- html page as a string
 // Output:
 // returns the pure text of the html page
