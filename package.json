@@ -23,15 +23,16 @@
   },
   "homepage": "https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1#readme",
   "devDependencies": {
-    "eslint": "^8.34.0",
+    "eslint": "^8.36.0",
     "eslint-config-google": "^0.14.0",
-    "jest": "^29.4.2",
-    "puppeteer": "^19.6.3",
+    "jest": "^29.5.0",
+    "puppeteer": "^19.7.5",
     "stylelint": "14.16.1",
     "stylelint-config-standard": "29.0.0"
   },
   "dependencies": {
     "dotenv": "^16.0.3",
+    "html-to-text": "^9.0.4",
     "puppeteer-test-browser-extension": "^1.2.2"
   }
 }

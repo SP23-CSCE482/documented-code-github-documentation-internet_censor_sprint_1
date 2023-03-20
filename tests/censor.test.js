@@ -15,10 +15,6 @@ describe('Test browser extension', () => {
     contentPage = extensionEnvironment.contentPage;
     extensionPage = extensionEnvironment.extensionPage;
   });
-  
-  afterAll(async () => {
-    await browser.close();
-  });
 
   it('Should open the extension\'s popup', async () => {
     // First, activate the content page
@@ -36,5 +32,9 @@ describe('Test browser extension', () => {
     const heading = await extensionPage.$('span');
     const extensionHeadingText = await heading.evaluate((e) => e.innerText);
     expect(extensionHeadingText).toEqual('Safe Internet');
+  });
+
+  afterAll(async () => {
+    await browser.close();
   });
 });
