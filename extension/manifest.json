@@ -11,7 +11,7 @@
     "activeTab",
     "storage"
   ],
-  "censor_scripts": [
+  "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
       "js": ["censor.js"],
