@@ -63,6 +63,7 @@ chrome.runtime.onInstalled.addListener(() => {
       console.log(result.keywords);
     } else { // uninitialised
       chrome.storage.local.set({keywords: initialWords});
+      chrome.storage.local.set({setup: true});
     }
   });
   logStorage();

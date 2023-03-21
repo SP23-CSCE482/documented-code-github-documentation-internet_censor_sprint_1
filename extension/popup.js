@@ -1,7 +1,9 @@
 const WORDS_KEY = 'keywords';
+const SETUP_KEY = 'setup';
+const url = "https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/related-words/";
 let wordsObj = {};
 
-// example restricted words
+// load restricted words
 chrome.storage.local.get(WORDS_KEY).then((result) => {
   wordsObj = result.keywords;
   console.log(wordsObj);
@@ -11,6 +13,43 @@ chrome.storage.local.get(WORDS_KEY).then((result) => {
 
 // element that represents the list of topics
 const topicsList = document.getElementsByClassName('container-words')[0];
+
+// Setup check
+chrome.storage.local.get(SETUP_KEY).then((result) => {
+  const init_state = result.setup;
+  if (!init_state) {
+    hideSection(getElementFromId('section-welcome'));
+    showSection(getElementFromId('section-controls'));
+  }
+});
+
+/**
+ * Makes GET request to server, and only adds unique keys
+ * @param {string} word 
+ */
+function callToServer(word) {
+  const request = url + word + '/';
+  console.log(request);
+  // GET all current keys
+  var keyDict = {};
+  chrome.storage.local.get(WORDS_KEY).then((result) => {
+    keyDict = result.keywords;
+  });
+
+  // Do request
+  fetch(request).then(result => {
+    const array = result.results;
+    console.log(array);
+    array.forEach((word) => {
+      // Add only if unique
+      if (!(word in keyDict)) {
+        saveWordToObj(word);
+        addWordToDisplay(word);
+      }
+    });
+
+  })
+}
 
 /**
  * Returns the element representation of the id.
@@ -196,14 +235,17 @@ getElementFromId('button-default-setup').addEventListener('click', () => {
 // 'Finish setup' button on topics screen completes setup
 getElementFromId('button-finish-setup').addEventListener('click', () => {
   console.debug('User clicked finish setup button');
+  chrome.storage.local.set({SETUP_KEY: false});
   sendListToBackend();
 });
 
 // 'Add' button on topics screen adds topic to list
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
+  // Call to server (word)
   addWordToDisplay(inputValue);
   saveWordToObj(inputValue);
+  //callToServer(inputValue);
   getElementFromId('section-choice-input').value = '';
 });
 
@@ -213,6 +255,7 @@ getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
     const inputValue = getElementFromId('section-choice-input').value;
     addWordToDisplay(inputValue);
     saveWordToObj(inputValue);
+    //callToServer(inputValue);
     getElementFromId('section-choice-input').value = '';
   }
 });
