@@ -1,8 +1,12 @@
 // Function to censor keywords on the web page.
 function censorKeywords(keywords) {
+  // If the keywords array is empty, do not proceed with the censoring.
+  if (keywords.length === 0) {
+    return;
+  }
   // Get all the text nodes on the web page that are not part of a script or style element.
   const textNodes = document.evaluate(
-    '//text()[not(ancestor::script)][not(ancestor::style)][not(ancestor::input)]',
+    '//text()[not(ancestor::script)][not(ancestor::style)]',
     document,
     null,
     XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
@@ -17,13 +21,8 @@ function censorKeywords(keywords) {
     const node = textNodes.snapshotItem(i);
     const textContent = node.textContent;
 
-    // Check if the text node is part of Google search result elements.
-    const isInGoogleSearchElement =
-      node.parentElement.closest('div[data-async-context]') ||
-      node.parentElement.closest('div[id="searchform"]');
-
     // Check if the text node contains any of the keywords to be censored.
-    if (!isInGoogleSearchElement && regex.test(textContent)) {
+    if (regex.test(textContent)) {
       // Replace the keywords with redacted elements.
       const newText = textContent.replace(regex, (match) => {
         const span = document.createElement('span');
@@ -40,11 +39,28 @@ function censorKeywords(keywords) {
   }
 }
 
+// Debounce function to limit how often a function is called.
+function debounce(func, wait) {
+  let timeout;
+  return function () {
+    const context = this;
+    const args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(context, args);
+    }, wait);
+  };
+}
+
+// ...
+
 // Observe DOM changes and re-run the censor function if any changes are detected.
 function observeDOMChanges(keywords) {
-  const observer = new MutationObserver(() => {
+  const debouncedCensorKeywords = debounce(() => {
     censorKeywords(keywords);
-  });
+  }, 1000); // Debounce time in milliseconds.
+
+  const observer = new MutationObserver(debouncedCensorKeywords);
 
   observer.observe(document.body, {
     childList: true,
@@ -54,6 +70,8 @@ function observeDOMChanges(keywords) {
   return observer;
 }
 
+// ...
+
 // Function to fetch keywords from chrome.storage and call the censorKeywords function.
 chrome.storage.local.get('keywords', function (result) {
   // Check if keywords are available in the storage.
@@ -62,6 +80,20 @@ chrome.storage.local.get('keywords', function (result) {
     const keywords = Object.keys(result.keywords).filter(
       (keyword) => result.keywords[keyword]
     );
+
+    // If the keywords array is empty, do not proceed with the censoring.
+    if (keywords.length === 0) {
+      return;
+    }
+
+    // Get the current URL.
+    const currentURL = window.location.href;
+
+    // Check if the current URL is Twitter or Google Search.
+    if (currentURL.includes('https://twitter.com') || currentURL.includes('https://www.google.com/search')) {
+      console.log('Censoring disabled for Twitter and Google Search.');
+      return;
+    }
 
     // Call the censorKeywords function with the fetched keywords.
     censorKeywords(keywords);
