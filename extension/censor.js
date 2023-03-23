@@ -1,72 +1,51 @@
-function censorWords(wordsToCensor) {
-    const regexPatterns = wordsToCensor.map(
-      (word) => new RegExp(`\\b${word}\\b`, "gi")
-    );
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT
-    );
-  
-    const nodesToReplace = [];
-  
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-  
-      for (const pattern of regexPatterns) {
-        if (pattern.test(node.textContent)) {
-          nodesToReplace.push({ node: node, pattern: pattern });
-        }
-      }
-    }
-  
-    for (const item of nodesToReplace) {
-      const node = item.node;
-      const pattern = item.pattern;
-      let textContent = node.textContent;
-  
-      textContent = textContent.replace(pattern, (match) => {
-        const span = document.createElement("span");
-        span.className = "redacted";
-        span.textContent = match;
-        span.setAttribute("data-word", match);
+// Function to censor keywords on the web page.
+function censorKeywords(keywords) {
+  // Get all the text nodes on the web page that are not part of a script or style element.
+  const textNodes = document.evaluate(
+    '//text()[not(ancestor::script)][not(ancestor::style)]',
+    document,
+    null,
+    XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+    null
+  );
+
+  // Create a regex pattern with the keywords to be censored.
+  const regex = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'gi');
+
+  // Iterate through all the text nodes.
+  for (let i = 0; i < textNodes.snapshotLength; i++) {
+    const node = textNodes.snapshotItem(i);
+    const textContent = node.textContent;
+
+    // Check if the text node contains any of the keywords to be censored.
+    if (regex.test(textContent)) {
+      // Replace the keywords with redacted elements.
+      const newText = textContent.replace(regex, (match) => {
+        const span = document.createElement('span');
+        span.className = 'redacted';
+        span.textContent = '****';
+        span.dataset.word = match;
         return span.outerHTML;
       });
-  
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = textContent;
-      const parentNode = node.parentNode;
-      let child;
-  
-      while ((child = tempDiv.firstChild)) {
-        parentNode.insertBefore(child, node);
-      }
-  
-      parentNode.removeChild(node);
+
+      // Create a document fragment with the new censored text and replace the original text node.
+      const fragment = document.createRange().createContextualFragment(newText);
+      node.parentNode.replaceChild(fragment, node);
     }
   }
+}
 
-  function fetchWordsAndCensor() {
-    chrome.storage.local.get('keywords', (result) => {
-      if (result.keywords) {
-        const wordsToCensor = Object.keys(result.keywords).filter((word) => result.keywords[word]);
-        censorWords(wordsToCensor);
-      }
-    });
+// Function to fetch keywords from chrome.storage and call the censorKeywords function.
+chrome.storage.local.get('keywords', function (result) {
+  // Check if keywords are available in the storage.
+  if (result.keywords) {
+    // Get the enabled keywords from the storage.
+    const keywords = Object.keys(result.keywords).filter(
+      (keyword) => result.keywords[keyword]
+    );
+    // Call the censorKeywords function with the fetched keywords.
+    censorKeywords(keywords);
+  } else {
+    console.error('No keywords found in storage');
   }
-
-
-
-
-
-  
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "censorWords") {
-      fetchWordsAndCensor();
-    }
-  });
-
-
-
-
-  fetchWordsAndCensor();
-  
+});
