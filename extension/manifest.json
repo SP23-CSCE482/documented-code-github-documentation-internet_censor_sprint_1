@@ -9,7 +9,16 @@
   },
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "contextMenus",
+    "scripting"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["censor.js"],
+      "css": ["styles.css"]
+    }
   ],
   "background": {
     "service_worker": "background.js"
