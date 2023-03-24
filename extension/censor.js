@@ -1,4 +1,7 @@
-// Function to censor keywords on the web page.
+/**
+ * Function to censor keywords on the web page.
+ * @param {string[]} keywords - An array of keywords to be censored.
+ */
 function censorKeywords(keywords) {
   // If the keywords array is empty, do not proceed with the censoring.
   if (keywords.length === 0) {
@@ -39,7 +42,12 @@ function censorKeywords(keywords) {
   }
 }
 
-// Debounce function to limit how often a function is called.
+/**
+ * Debounce function to limit how often a function is called.
+ * @param {Function} func - The function to be debounced.
+ * @param {number} wait - The debounce delay in milliseconds.
+ * @returns {Function} - A debounced version of the given function.
+ */
 function debounce(func, wait) {
   let timeout;
   return function () {
@@ -52,9 +60,13 @@ function debounce(func, wait) {
   };
 }
 
-// ...
 
-// Observe DOM changes and re-run the censor function if any changes are detected.
+
+/**
+ * Observe DOM changes and re-run the censor function if any changes are detected.
+ * @param {string[]} keywords - An array of keywords to be censored.
+ * @returns {MutationObserver} - A MutationObserver instance for observing DOM changes.
+ */
 function observeDOMChanges(keywords) {
   const debouncedCensorKeywords = debounce(() => {
     censorKeywords(keywords);
@@ -70,7 +82,7 @@ function observeDOMChanges(keywords) {
   return observer;
 }
 
-// ...
+
 
 // Function to fetch keywords from chrome.storage and call the censorKeywords function.
 chrome.storage.local.get('keywords', function (result) {
