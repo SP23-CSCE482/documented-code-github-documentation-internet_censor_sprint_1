@@ -50,15 +50,15 @@ function censorKeywords(keywords) {
  */
 function debounce(func, wait) {
   let timeout;
-  return function () {
+  return function (...args) {
     const context = this;
-    const args = arguments;
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       func.apply(context, args);
     }, wait);
   };
 }
+
 
 
 
