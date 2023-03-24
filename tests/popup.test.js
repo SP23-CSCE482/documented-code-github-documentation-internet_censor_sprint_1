@@ -15,7 +15,7 @@ describe('Test browser extension', () => {
     contentPage = extensionEnvironment.contentPage;
     extensionPage = extensionEnvironment.extensionPage;
   });
-  
+
   afterAll(async () => {
     await browser.close();
   });

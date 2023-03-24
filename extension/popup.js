@@ -1,6 +1,6 @@
 const WORDS_KEY = 'keywords';
 const SETUP_KEY = 'setup';
-const url = "https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/related-words/";
+
 let wordsObj = {};
 
 // load restricted words
@@ -16,40 +16,12 @@ const topicsList = document.getElementsByClassName('container-words')[0];
 
 // Setup check
 chrome.storage.local.get(SETUP_KEY).then((result) => {
-  const init_state = result.setup;
-  if (!init_state) {
+  const initState = result.setup;
+  if (!initState) {
     hideSection(getElementFromId('section-welcome'));
     showSection(getElementFromId('section-controls'));
   }
 });
-
-/**
- * Makes GET request to server, and only adds unique keys
- * @param {string} word 
- */
-function callToServer(word) {
-  const request = url + word + '/';
-  console.log(request);
-  // GET all current keys
-  var keyDict = {};
-  chrome.storage.local.get(WORDS_KEY).then((result) => {
-    keyDict = result.keywords;
-  });
-
-  // Do request
-  fetch(request).then(result => {
-    const array = result.results;
-    console.log(array);
-    array.forEach((word) => {
-      // Add only if unique
-      if (!(word in keyDict)) {
-        saveWordToObj(word);
-        addWordToDisplay(word);
-      }
-    });
-
-  })
-}
 
 /**
  * Returns the element representation of the id.
@@ -219,6 +191,37 @@ function sendListToBackend() {
   })();
 }
 
+/**
+ * Sends a message to the extension with the word to send to server.
+ * @param {string} word
+ */
+async function sendWordToBackend(word) {
+  (async () => {
+    const response = await chrome.runtime.sendMessage({
+      msg_type: 'server_call',
+      msg_content: {word: word},
+    });
+    // GET all current keys
+    let keyDict = {};
+    chrome.storage.local.get(WORDS_KEY).then((result) => {
+      keyDict = result.keywords;
+    });
+    console.debug('Popup recieved acknowledgement', response);
+    if (response.status == 'ok') {
+      const words = response.words;
+      console.log(words);
+      words.forEach((element) => {
+        if (!(element in keyDict)) {
+          saveWordToObj(element);
+          addWordToDisplay(element);
+        }
+      });
+    } else {
+      console.error('Extension did not acknowledge message');
+    }
+  })();
+}
+
 // 'Set up custom topics' button shows the topic list screen
 getElementFromId('button-continue-setup').addEventListener('click', () => {
   hideSection(getElementFromId('section-welcome'));
@@ -243,9 +246,9 @@ getElementFromId('button-finish-setup').addEventListener('click', () => {
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
   // Call to server (word)
-  addWordToDisplay(inputValue);
   saveWordToObj(inputValue);
-  //callToServer(inputValue);
+  addWordToDisplay(inputValue);
+  sendWordToBackend(inputValue);
   getElementFromId('section-choice-input').value = '';
 });
 
@@ -253,9 +256,9 @@ getElementFromId('button-add-word').addEventListener('click', () => {
 getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
   if (e.key=='Enter') {
     const inputValue = getElementFromId('section-choice-input').value;
-    addWordToDisplay(inputValue);
     saveWordToObj(inputValue);
-    //callToServer(inputValue);
+    addWordToDisplay(inputValue);
+    sendWordToBackend(inputValue);
     getElementFromId('section-choice-input').value = '';
   }
 });
