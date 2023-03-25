@@ -246,6 +246,7 @@ getElementFromId('button-continue-setup').addEventListener('click', () => {
 // 'Use defaults' button completes setup
 getElementFromId('button-default-setup').addEventListener('click', () => {
   console.debug('User chose to use default configuration');
+  chrome.storage.local.set({setup: false});
   sendListToBackend();
 });
 
