@@ -1,7 +1,9 @@
 const WORDS_KEY = 'keywords';
+const SETUP_KEY = 'setup';
+
 let wordsObj = {};
 
-// example restricted words
+// load restricted words
 chrome.storage.local.get(WORDS_KEY).then((result) => {
   wordsObj = result.keywords;
   console.log(wordsObj);
@@ -11,6 +13,15 @@ chrome.storage.local.get(WORDS_KEY).then((result) => {
 
 // element that represents the list of topics
 const topicsList = document.getElementsByClassName('container-words')[0];
+
+// Setup check
+chrome.storage.local.get(SETUP_KEY).then((result) => {
+  const initState = result.setup;
+  if (!initState) {
+    hideSection(getElementFromId('section-welcome'));
+    showSection(getElementFromId('section-controls'));
+  }
+});
 
 /**
  * Returns the element representation of the id.
@@ -180,6 +191,37 @@ function sendListToBackend() {
   })();
 }
 
+/**
+ * Sends a message to the extension with the word to send to server.
+ * @param {string} word
+ */
+async function sendWordToBackend(word) {
+  (async () => {
+    const response = await chrome.runtime.sendMessage({
+      msg_type: 'server_call',
+      msg_content: {word: word},
+    });
+    // GET all current keys
+    let keyDict = {};
+    chrome.storage.local.get(WORDS_KEY).then((result) => {
+      keyDict = result.keywords;
+    });
+    console.debug('Popup recieved acknowledgement', response);
+    if (response.status == 'ok') {
+      const words = response.words;
+      console.log(words);
+      words.forEach((element) => {
+        if (!(element in keyDict)) {
+          saveWordToObj(element);
+          addWordToDisplay(element);
+        }
+      });
+    } else {
+      console.error('Extension did not acknowledge message');
+    }
+  })();
+}
+
 // 'Set up custom topics' button shows the topic list screen
 getElementFromId('button-continue-setup').addEventListener('click', () => {
   hideSection(getElementFromId('section-welcome'));
@@ -196,14 +238,17 @@ getElementFromId('button-default-setup').addEventListener('click', () => {
 // 'Finish setup' button on topics screen completes setup
 getElementFromId('button-finish-setup').addEventListener('click', () => {
   console.debug('User clicked finish setup button');
+  chrome.storage.local.set({SETUP_KEY: false});
   sendListToBackend();
 });
 
 // 'Add' button on topics screen adds topic to list
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
-  addWordToDisplay(inputValue);
+  // Call to server (word)
   saveWordToObj(inputValue);
+  addWordToDisplay(inputValue);
+  sendWordToBackend(inputValue);
   getElementFromId('section-choice-input').value = '';
 });
 
@@ -211,8 +256,9 @@ getElementFromId('button-add-word').addEventListener('click', () => {
 getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
   if (e.key=='Enter') {
     const inputValue = getElementFromId('section-choice-input').value;
-    addWordToDisplay(inputValue);
     saveWordToObj(inputValue);
+    addWordToDisplay(inputValue);
+    sendWordToBackend(inputValue);
     getElementFromId('section-choice-input').value = '';
   }
 });
