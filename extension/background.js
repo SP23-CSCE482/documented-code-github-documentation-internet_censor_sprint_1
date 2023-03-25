@@ -95,8 +95,10 @@ chrome.runtime.onInstalled.addListener(() => {
     if (result.keywords) { // defined
       console.log(result.keywords);
     } else { // uninitialised
+      console.log('HERE');
       chrome.storage.local.set({keywords: initialWords});
       chrome.storage.local.set({setup: true});
+      chrome.storage.local.set({toggle: false});
     }
   });
   logStorage();

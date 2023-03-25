@@ -1,5 +1,19 @@
 const WORDS_KEY = 'keywords';
 const SETUP_KEY = 'setup';
+const TOGGLE_KEY = 'toggle';
+const toggleButton = getElementFromId('button-toggle-active');
+
+// Set up button state
+chrome.storage.local.get(TOGGLE_KEY).then((result) => {
+  const buttonState = result.toggle;
+  if (buttonState) {
+    toggleButton.classList.add('btn-success');
+    toggleButton.textContent = 'Enable Censor';
+  } else {
+    toggleButton.classList.add('btn-danger');
+    toggleButton.textContent = 'Disable Censor';
+  }
+});
 
 let wordsObj = {};
 
@@ -238,8 +252,26 @@ getElementFromId('button-default-setup').addEventListener('click', () => {
 // 'Finish setup' button on topics screen completes setup
 getElementFromId('button-finish-setup').addEventListener('click', () => {
   console.debug('User clicked finish setup button');
-  chrome.storage.local.set({SETUP_KEY: false});
+  chrome.storage.local.set({setup: false});
   sendListToBackend();
+});
+
+// Censor Toggle On and Off button
+getElementFromId('button-toggle-active').addEventListener('click', () => {
+  chrome.storage.local.get(TOGGLE_KEY).then((result) => {
+    let state = result.toggle;
+    console.log(state);
+    state = !state;
+    console.log(state);
+    chrome.storage.local.set({toggle: state});
+    toggleButton.classList.toggle('btn-danger');
+    toggleButton.classList.toggle('btn-success');
+    if (toggleButton.classList.contains('btn-danger')) {
+      toggleButton.textContent = 'Disable Censor';
+    } else {
+      toggleButton.textContent = 'Enable Censor';
+    }
+  });
 });
 
 // 'Add' button on topics screen adds topic to list
