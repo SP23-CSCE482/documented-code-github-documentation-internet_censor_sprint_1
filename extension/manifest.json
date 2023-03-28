@@ -9,8 +9,18 @@
   },
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "contextMenus",
+    "scripting"
   ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["censor.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "host_permissions": ["https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/*"],
   "background": {
     "service_worker": "background.js"
   }

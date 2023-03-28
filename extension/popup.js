@@ -1,7 +1,23 @@
 const WORDS_KEY = 'keywords';
+const SETUP_KEY = 'setup';
+const TOGGLE_KEY = 'toggle';
+const toggleButton = getElementFromId('button-toggle-active');
+
+// Set up button state
+chrome.storage.local.get(TOGGLE_KEY).then((result) => {
+  const buttonState = result.toggle;
+  if (buttonState) {
+    toggleButton.classList.add('btn-success');
+    toggleButton.textContent = 'Enable Censor';
+  } else {
+    toggleButton.classList.add('btn-danger');
+    toggleButton.textContent = 'Disable Censor';
+  }
+});
+
 let wordsObj = {};
 
-// example restricted words
+// load restricted words
 chrome.storage.local.get(WORDS_KEY).then((result) => {
   wordsObj = result.keywords;
   console.log(wordsObj);
@@ -11,6 +27,15 @@ chrome.storage.local.get(WORDS_KEY).then((result) => {
 
 // element that represents the list of topics
 const topicsList = document.getElementsByClassName('container-words')[0];
+
+// Setup check
+chrome.storage.local.get(SETUP_KEY).then((result) => {
+  const initState = result.setup;
+  if (!initState) {
+    hideSection(getElementFromId('section-welcome'));
+    showSection(getElementFromId('section-controls'));
+  }
+});
 
 /**
  * Returns the element representation of the id.
@@ -180,6 +205,37 @@ function sendListToBackend() {
   })();
 }
 
+/**
+ * Sends a message to the extension with the word to send to server.
+ * @param {string} word
+ */
+async function sendWordToBackend(word) {
+  (async () => {
+    const response = await chrome.runtime.sendMessage({
+      msg_type: 'server_call',
+      msg_content: {word: word},
+    });
+    // GET all current keys
+    let keyDict = {};
+    chrome.storage.local.get(WORDS_KEY).then((result) => {
+      keyDict = result.keywords;
+    });
+    console.debug('Popup recieved acknowledgement', response);
+    if (response.status == 'ok') {
+      const words = response.words;
+      console.log(words);
+      words.forEach((element) => {
+        if (!(element in keyDict)) {
+          saveWordToObj(element);
+          addWordToDisplay(element);
+        }
+      });
+    } else {
+      console.error('Extension did not acknowledge message');
+    }
+  })();
+}
+
 // 'Set up custom topics' button shows the topic list screen
 getElementFromId('button-continue-setup').addEventListener('click', () => {
   hideSection(getElementFromId('section-welcome'));
@@ -190,20 +246,42 @@ getElementFromId('button-continue-setup').addEventListener('click', () => {
 // 'Use defaults' button completes setup
 getElementFromId('button-default-setup').addEventListener('click', () => {
   console.debug('User chose to use default configuration');
+  chrome.storage.local.set({setup: false});
   sendListToBackend();
 });
 
 // 'Finish setup' button on topics screen completes setup
 getElementFromId('button-finish-setup').addEventListener('click', () => {
   console.debug('User clicked finish setup button');
+  chrome.storage.local.set({setup: false});
   sendListToBackend();
+});
+
+// Censor Toggle On and Off button
+getElementFromId('button-toggle-active').addEventListener('click', () => {
+  chrome.storage.local.get(TOGGLE_KEY).then((result) => {
+    let state = result.toggle;
+    console.log(state);
+    state = !state;
+    console.log(state);
+    chrome.storage.local.set({toggle: state});
+    toggleButton.classList.toggle('btn-danger');
+    toggleButton.classList.toggle('btn-success');
+    if (toggleButton.classList.contains('btn-danger')) {
+      toggleButton.textContent = 'Disable Censor';
+    } else {
+      toggleButton.textContent = 'Enable Censor';
+    }
+  });
 });
 
 // 'Add' button on topics screen adds topic to list
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
-  addWordToDisplay(inputValue);
+  // Call to server (word)
   saveWordToObj(inputValue);
+  addWordToDisplay(inputValue);
+  sendWordToBackend(inputValue);
   getElementFromId('section-choice-input').value = '';
 });
 
@@ -211,8 +289,9 @@ getElementFromId('button-add-word').addEventListener('click', () => {
 getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
   if (e.key=='Enter') {
     const inputValue = getElementFromId('section-choice-input').value;
-    addWordToDisplay(inputValue);
     saveWordToObj(inputValue);
+    addWordToDisplay(inputValue);
+    sendWordToBackend(inputValue);
     getElementFromId('section-choice-input').value = '';
   }
 });

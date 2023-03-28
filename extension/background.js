@@ -1,3 +1,30 @@
+const url = 'https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/related-words/';
+
+/**
+ * Makes the call to server finding nine related words to the original.
+ * @param {string} url
+ * @return {string} results
+ */
+async function callToServer(url) {
+  const result = await fetch(url).then((response) => response.json());
+  return result.results;
+}
+
+/**
+ * Handles the word call and sends the response back to the popup.
+ * @param {string} word
+ * @param {json} sendResponse
+ */
+async function wordsCall(word, sendResponse) {
+  const urlrequest = url + word + '/';
+  console.log(urlrequest);
+
+  // Do request
+  const array = await callToServer(urlrequest);
+  console.log(array);
+  sendResponse({status: 'ok', words: array});
+}
+
 // listen for 'messages' from extension and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.debug('Extension recieved message', request);
@@ -17,6 +44,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // send reply back to popup
     sendResponse({status: 'ok'});
+  } else if (isFromExt && isValid &&
+    'word' in request.msg_content &&
+    request.msg_type == 'server_call') {
+    const word = request.msg_content.word;
+    wordsCall(word, sendResponse);
+    return true;
   } else {
     // ignore all other messages
     console.error('Message is invalid');
@@ -62,7 +95,10 @@ chrome.runtime.onInstalled.addListener(() => {
     if (result.keywords) { // defined
       console.log(result.keywords);
     } else { // uninitialised
+      console.log('HERE');
       chrome.storage.local.set({keywords: initialWords});
+      chrome.storage.local.set({setup: true});
+      chrome.storage.local.set({toggle: false});
     }
   });
   logStorage();

@@ -1,31 +1,37 @@
 from gensim.test.utils import common_texts
 from gensim.models import Word2Vec,KeyedVectors
 import gensim.downloader
-import torch
-from transformers import pipeline, set_seed
-
-set_seed(42)
-sentiment_analysis_model = pipeline("sentiment-analysis")
-
-word = input('Enter a word:')
-print('You entered:',word)
-
-# my trained similarity model
-# model = Word2Vec(sentences=common_texts, vector_size=100, window=5, min_count=1, workers=4)
-# vector = model.wv['computer']
-# sims = model.wv.most_similar('computer', topn=10)
+import numpy as np
 
 # pretrained similarity model
 wikiModel = gensim.downloader.load('glove-wiki-gigaword-50')
 twitterModel = gensim.downloader.load('glove-twitter-50')
-# print('Wiki Output:',wikiModel.most_similar('violence'))
-# print('Twitter Output:',twitterModel.most_similar('violence'))
-print('Wiki Output:',wikiModel.most_similar(word))
-print('Twitter Output:',twitterModel.most_similar(word))
 
-# sentiment analysis section
-sentiment = sentiment_analysis_model(word, top_k=1)
-print("Sentiment: ", sentiment[0]["label"])
-print("Confidence Score: ", sentiment[0]["score"])
+def findSimilarWords(word: str):
+    output = []
+    wikiOutput = wikiModel.most_similar(word)
+    twitterOutput = twitterModel.most_similar(word)
+
+    print("Wiki model output:",wikiOutput)
+    print("Twitter model output:",twitterOutput)
+    
+    wikiMean = np.mean(list(zip(*wikiOutput))[1])
+    twittMean = np.mean(list(zip(*twitterOutput))[1])
+
+    print("Wiki model mean:",wikiMean)
+    print("Twitter model mean:",twittMean)
+
+    if (wikiMean > twittMean):
+        output = wikiOutput
+    else:
+        output = twitterOutput
+
+    return list(zip(*output))[0]
+
+
+word = 'violence' # input('Enter a word:')
+print('You entered:',word)
+out = findSimilarWords(word)
+print(out)
 
 print("Done running")
