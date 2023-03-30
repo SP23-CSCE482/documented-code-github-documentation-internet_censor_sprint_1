@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-size: 1.25em;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+    <script>
+        // The minimum prediction confidence.
+        const threshold = 0.9;
+
+        document.body.innerHTML = "<pre></pre>";
+        document.body.firstChild.innerHTML += "Toxicity Model Demo\n\n";
+        document.body.firstChild.innerHTML += "Loading model...\n\n";
+
+        // Load the model. Users optionally pass in a threshold and an array of labels to include.
+        toxicity.load(threshold).then(model => {
+            const sentences = ['you suck', "no, im cookie monster"];
+            document.body.firstChild.innerHTML += "Doing prediction...\n\n";
+            model.classify(sentences).then(predictions => {
+                // `predictions` is an array of objects, one for each prediction head,
+                // that contains the raw probabilities for each input along with the
+                // final prediction in `match` (either `true` or `false`).
+                // If neither prediction exceeds the threshold, `match` is `null`.
+
+                document.body.firstChild.innerHTML += [
+                    "Input: [\"" + sentences.join("\", \"") + "\"]",
+                    "Result: " + JSON.stringify(predictions, null, 4)
+                ].join("\n\n");
+            });
+        });
+    </script>
+</body>
+
+</html>

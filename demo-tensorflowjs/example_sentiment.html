@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-size: 1.25em;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script>
+        document.body.innerHTML = "<pre></pre>";
+        document.body.firstChild.innerHTML += "Sentiment Model Demo\n\n";
+        document.body.firstChild.innerHTML += "Loading model...\n\n";
+
+        function padSequences(sequences, maxLen, padding = 'pre', truncating = 'pre', value = 0) {
+            return sequences.map(seq => {
+                // Perform truncation.
+                if (seq.length > maxLen) {
+                    if (truncating === 'pre') {
+                        seq.splice(0, seq.length - maxLen);
+                    } else {
+                        seq.splice(maxLen, seq.length - maxLen);
+                    }
+                }
+
+                // Perform padding.
+                if (seq.length < maxLen) {
+                    const pad = [];
+                    for (let i = 0; i < maxLen - seq.length; ++i) {
+                        pad.push(value);
+                    }
+                    if (padding === 'pre') {
+                        seq = pad.concat(seq);
+                    } else {
+                        seq = seq.concat(pad);
+                    }
+                }
+
+                return seq;
+            });
+        }
+
+        class SentimentPredictor {
+            async init(urls) {
+                this.urls = urls;
+                this.model = await (async function (url) {
+                    try {
+                        const model = await tf.loadLayersModel(url);
+                        return model;
+                    } catch (err) {
+                        console.error(err);
+                        console.log('Loading pretrained model failed.');
+                    }
+                })(urls.model);
+                await this.loadMetadata();
+                return this;
+            }
+
+            async loadMetadata() {
+                const sentimentMetadata = await (async function (url) {
+                    try {
+                        const metadataJson = await fetch(url);
+                        const metadata = await metadataJson.json();
+                        return metadata;
+                    } catch (err) {
+                        console.error(err);
+                        console.log('Loading metadata failed.');
+                    }
+                })(this.urls.metadata);
+                this.indexFrom = sentimentMetadata['index_from'];
+                this.maxLen = sentimentMetadata['max_len'];
+                this.wordIndex = sentimentMetadata['word_index'];
+                this.vocabularySize = sentimentMetadata['vocabulary_size'];
+            }
+
+            predict(text) {
+                // Convert to lower case and remove all punctuations.
+                const inputText = text.trim().toLowerCase().replace(/(\.|\,|\!)/g, '').split(' ');
+
+                // Convert the words to a sequence of word indices.
+                const sequence = inputText.map(word => {
+                    let wordIndex = this.wordIndex[word] + this.indexFrom;
+                    if (wordIndex > this.vocabularySize) { wordIndex = 2; }
+                    return wordIndex;
+                });
+
+                // Perform truncation and padding.
+                const paddedSequence = padSequences([sequence], this.maxLen);
+                const input = tf.tensor2d(paddedSequence, [1, this.maxLen]);
+
+                // actual inference
+                const beginMs = performance.now();
+                const predictOut = this.model.predict(input);
+                const score = predictOut.dataSync()[0];
+                predictOut.dispose();
+                const endMs = performance.now();
+
+                return { score: score, elapsed: (endMs - beginMs) };
+            }
+        };
+
+        async function setupSentiment() {
+            const HOSTED_URLS = {
+                model: 'https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/model.json',
+                metadata: 'https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/metadata.json'
+            };
+
+            const INPUT_STRINGS = [
+                "The call went horribly wrong.",
+                "This macaroni is really good."
+            ];
+
+            const predictor = await new SentimentPredictor().init(HOSTED_URLS);
+            INPUT_STRINGS.forEach(input_string => {
+                document.body.firstChild.innerHTML += "Input: \"" + input_string + "\"\n";
+                const result = predictor.predict(input_string);
+                const printed_result = {
+                    "sentiment": result["score"] >= 0.5 ? "positive" : "negative",
+                    "score": result["score"],
+                    "elapsed": result["elapsed"]
+                };
+                document.body.firstChild.innerHTML += "Result: " + (JSON.stringify(printed_result, null, 4));
+                document.body.firstChild.innerHTML += "\n\n";
+            });
+        }
+
+        setupSentiment();
+    </script>
+</body>
+
+</html>
