@@ -98,7 +98,8 @@ chrome.runtime.onInstalled.addListener(() => {
       console.log('HERE');
       chrome.storage.local.set({keywords: initialWords});
       chrome.storage.local.set({setup: true});
-      chrome.storage.local.set({toggle: false});
+      chrome.storage.local.set({keywordtoggle: false});
+      chrome.storage.local.set({contexttoggle: false});
     }
   });
   logStorage();

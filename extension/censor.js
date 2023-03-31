@@ -81,8 +81,8 @@ function observeDOMChanges(keywords) {
 
 
 // Function to fetch keywords from chrome.storage and call the censorKeywords function.
-chrome.storage.local.get('toggle', function(result) {
-  if (!result.toggle) {
+chrome.storage.local.get('keywordtoggle', function(result) {
+  if (!result.keywordtoggle) {
     chrome.storage.local.get('keywords', function(result) {
       // Check if keywords are available in the storage.
       if (result.keywords) {

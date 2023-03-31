@@ -1,17 +1,31 @@
 const WORDS_KEY = 'keywords';
 const SETUP_KEY = 'setup';
-const TOGGLE_KEY = 'toggle';
+const KEYTOGGLE_KEY = 'keywordtoggle';
+const CONTOGGLE_KEY = 'contexttoggle';
 const toggleButton = getElementFromId('button-toggle-active');
+const contextToggleButton = getElementFromId('button-context-toggle-active');
 
 // Set up button state
-chrome.storage.local.get(TOGGLE_KEY).then((result) => {
-  const buttonState = result.toggle;
+chrome.storage.local.get(KEYTOGGLE_KEY).then((result) => {
+  const buttonState = result.keywordtoggle;
   if (buttonState) {
     toggleButton.classList.add('btn-success');
-    toggleButton.textContent = 'Enable Censor';
+    toggleButton.textContent = 'Enable Keyword Censor';
   } else {
     toggleButton.classList.add('btn-danger');
-    toggleButton.textContent = 'Disable Censor';
+    toggleButton.textContent = 'Disable Keyword Censor';
+  }
+});
+
+// Set up button state
+chrome.storage.local.get(CONTOGGLE_KEY).then((result) => {
+  const buttonState = result.contexttoggle;
+  if (buttonState) {
+    contextToggleButton.classList.add('btn-success');
+    contextToggleButton.textContent = 'Enable Context Censor';
+  } else {
+    contextToggleButton.classList.add('btn-danger');
+    contextToggleButton.textContent = 'Disable Context Censor';
   }
 });
 
@@ -259,18 +273,36 @@ getElementFromId('button-finish-setup').addEventListener('click', () => {
 
 // Censor Toggle On and Off button
 getElementFromId('button-toggle-active').addEventListener('click', () => {
-  chrome.storage.local.get(TOGGLE_KEY).then((result) => {
-    let state = result.toggle;
+  chrome.storage.local.get(KEYTOGGLE_KEY).then((result) => {
+    let state = result.keywordtoggle;
     console.log(state);
     state = !state;
     console.log(state);
-    chrome.storage.local.set({toggle: state});
+    chrome.storage.local.set({keywordtoggle: state});
     toggleButton.classList.toggle('btn-danger');
     toggleButton.classList.toggle('btn-success');
     if (toggleButton.classList.contains('btn-danger')) {
-      toggleButton.textContent = 'Disable Censor';
+      toggleButton.textContent = 'Disable Keyword Censor';
     } else {
-      toggleButton.textContent = 'Enable Censor';
+      toggleButton.textContent = 'Enable Keyword Censor';
+    }
+  });
+});
+
+// Censor Context Toggle On and Off button
+getElementFromId('button-context-toggle-active').addEventListener('click', () => {
+  chrome.storage.local.get(CONTOGGLE_KEY).then((result) => {
+    let state = result.contexttoggle;
+    console.log(state);
+    state = !state;
+    console.log(state);
+    chrome.storage.local.set({contexttoggle: state});
+    contextToggleButton.classList.toggle('btn-danger');
+    contextToggleButton.classList.toggle('btn-success');
+    if (contextToggleButton.classList.contains('btn-danger')) {
+      contextToggleButton.textContent = 'Disable Context Censor';
+    } else {
+      conextToggleButton.textContent = 'Enable Context Censor';
     }
   });
 });
