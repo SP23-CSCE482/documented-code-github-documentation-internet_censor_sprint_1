@@ -22,6 +22,7 @@
   ],
   "host_permissions": ["https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/*"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   }
 }
