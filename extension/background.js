@@ -1,3 +1,6 @@
+import { ToxicityClassifier } from "./toxicity.js";
+
+
 const url = 'https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/related-words/';
 
 /**
@@ -32,24 +35,49 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const isFromExt = chrome.runtime.id == sender.id;
   const isValid = 'msg_type' in request && 'msg_content' in request;
 
-  // handle message that has topics list
-  if (isFromExt && isValid &&
-    'list' in request.msg_content &&
+  if (isFromExt && isValid) {
+
+    // handle message that has topics list
+    if ('list' in request.msg_content &&
     request.msg_type == 'first_save_topics' &&
     request.msg_content.list.length >= 1) {
-    console.debug('Message has the topics list');
+      console.debug('Message has the topics list');
 
-    // do something with topic list
-    console.debug('Topics list is', request.msg_content.list);
+      // do something with topic list
+      console.debug('Topics list is', request.msg_content.list);
 
-    // send reply back to popup
-    sendResponse({status: 'ok'});
-  } else if (isFromExt && isValid &&
-    'word' in request.msg_content &&
+      // send reply back to popup
+      sendResponse({status: 'ok'});
+    }
+
+    // handle message for related words server call
+    else if ('word' in request.msg_content &&
     request.msg_type == 'server_call') {
-    const word = request.msg_content.word;
-    wordsCall(word, sendResponse);
-    return true;
+      const word = request.msg_content.word;
+      wordsCall(word, sendResponse);
+      return true;
+    }
+
+    // handle message for toxicity prediction
+    else if (request.msg_type === 'is_toxic' && 'input' in request.msg_content) {
+      const inputString = request.msg_content.input;
+      try {
+        ToxicityClassifier.isToxic(inputString).then(toxicityPrediction => {
+          console.log(toxicityPrediction);
+          sendResponse({ status: 'ok', result: toxicityPrediction });
+        });
+      } catch (error) {
+        console.error(error);
+        sendResponse({ status: 'failed' });
+      }
+    }
+
+    // handle message that has required parts but contents are not valid
+    else {
+      console.error('Message is invalid');
+      sendResponse({ status: 'failed' });
+    }
+
   } else {
     // ignore all other messages
     console.error('Message is invalid');
