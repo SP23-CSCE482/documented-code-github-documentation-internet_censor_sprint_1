@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Browser extension for content filtering",
   "source": "extension/manifest.json",
-  "main": "index.js",
   "directories": {
     "test": "tests"
   },
