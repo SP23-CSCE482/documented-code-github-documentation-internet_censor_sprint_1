@@ -143,6 +143,74 @@ section p {
     color: #313131;
 }
 
+/* section: catagories */
+#section-catagories .horizontal-form-row > input {
+    border: none;
+    margin-right: 10px;
+    background-color: var(--light-background);
+    font-weight: 500;
+    flex: 2;
+    box-shadow: none;
+    font-size: 16px;
+    padding: 8px 15px;
+}
+
+#section-catagories .horizontal-form-row > button:last-child {
+    font-weight: 600;
+    border: none;
+    padding: 0;
+    border-radius: 100%;
+}
+
+#section-catagories .horizontal-form-row > button > span {
+    width: 40px;
+    line-height: 1;
+    display: block;
+    font-size: 25px;
+    font-weight: 400;
+    position: relative;
+    top: -2px;
+}
+
+#section-catagories .horizontal-form-row {
+    margin-bottom: 10px;
+    display: flex;
+}
+
+#selection-catagories #button-finish-setup {
+    margin-top: 30px;
+}
+
+#section-catagories > .container-words {
+    margin-bottom: 10px;
+    margin-top: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#section-catagories > .container-words > .word-container {
+    background-color: var(--light-background);
+    border-radius: 0.5rem;
+    margin-bottom: 7px;
+    padding: 8px 15px;
+    width: 100%;
+    color: black;
+    display: flex;
+    justify-items: stretch;
+    justify-content: space-between;
+    cursor: default;
+}
+
+#section-catagories > .container-words > .word-container > .remove-icon-container > i {
+    cursor: pointer;
+    color: #b2b2b2;
+    transition: color 0.1s linear;
+}
+
+#section-catagories > .container-words > .word-container > .remove-icon-container > i:hover {
+    color: #313131;
+}
+
 /* section: controls */
 #section-controls p:not(:first-of-type) {
     font-size: 13px;

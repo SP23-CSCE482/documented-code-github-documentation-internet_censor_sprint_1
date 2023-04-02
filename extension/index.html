@@ -37,8 +37,8 @@
     <!-- section: lets the user pick initial topics -->
     <section id="section-choice">
       <h1>Add keyword</h1>
-      <p>These keywords will be dynamically removed from pages as you browse. Every keyword you add up to 10 associated words are found.</p>
-      <div class="container-words"></div>
+      <p>These keywords will be dynamically be removed from pages as you browse. Every keyword you add up to 10 associated words are found.</p>
+      <div class="container-words" id="words-section"></div>
       <div class="horizontal-form-row">
         <input type="text" class="form-control" id="section-choice-input" placeholder="Enter a topic">
         <button type="button" class="btn btn-primary" id="button-add-word"><span>+</span></button>
@@ -46,14 +46,23 @@
       <button type="button" class="block-btn btn btn-primary" id="button-finish-setup">Finish setup</button>
     </section>
 
+    <!-- section: lets the user pick initial topics -->
+    <section id="section-catagories">
+      <h1>Catagories</h1>
+      <p>These catagories will be censored as you browse.</p>
+      <div class="container-words" id="catagories-section"></div>
+      <button type="button" class="block-btn btn btn-primary" id="button-finish-catagories">Return to Main Page</button>
+    </section>
+
     <!-- section: main controls after setup -->
     <section id="section-controls">
       <h1>Controls</h1>
       <p style="margin-bottom: 20px;">Configure SIC to your liking.</p>
-      <button type="button" class="block-btn btn" id="button-context-toggle-active">Disable Context Censor</button>
+      <button type="button" class="block-btn btn" id="button-context-toggle-active">Disable Toxicity Censor</button>
       <button type="button" class="block-btn btn" id="button-toggle-active">Disable Keyword Censor</button>
       <p>Controls whether filtering is active. Disabling the filter always shows the original content.</p>
-      <button type="button" class="block-btn btn btn-primary" id="button-open-settings">Open settings <i style="margin-left:5px;" class="bi bi-box-arrow-up-right"></i></button>
+      <button type="button" class="block-btn btn btn-primary" id="button-open-settings">Open Keyword settings <i style="margin-left:5px;" class="bi bi-box-arrow-up-right"></i></button>
+      <button type="button" class="block-btn btn btn-primary" id="button-open-toxic-settings">Open Toxicity settings <i style="margin-left:5px;" class="bi bi-box-arrow-up-right"></i></button>
       <p>Opens SIC's global settings. You can add and remove sensitive topics here.</p>
     </section>
 

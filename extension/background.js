@@ -91,12 +91,23 @@ chrome.runtime.onInstalled.addListener(() => {
     'murder': true,
     'suicide': true}; // Nothing wrong with literals
 
+  const initialCatagories = {
+    'identity attack': true,
+    'insult': true,
+    'obscene': true,
+    'severe toxicity': true,
+    'sexual explicit': true,
+    'threat': true,
+    'toxicity': true,
+  };
+
   chrome.storage.local.get('keywords', function(result) {
     if (result.keywords) { // defined
       console.log(result.keywords);
     } else { // uninitialised
       console.log('HERE');
       chrome.storage.local.set({keywords: initialWords});
+      chrome.storage.local.set({catagories: initialCatagories});
       chrome.storage.local.set({setup: true});
       chrome.storage.local.set({keywordtoggle: false});
       chrome.storage.local.set({contexttoggle: false});

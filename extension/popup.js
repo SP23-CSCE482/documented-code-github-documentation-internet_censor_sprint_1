@@ -1,9 +1,12 @@
 const WORDS_KEY = 'keywords';
 const SETUP_KEY = 'setup';
+const CATA_KEY = 'catagories';
 const KEYTOGGLE_KEY = 'keywordtoggle';
 const CONTOGGLE_KEY = 'contexttoggle';
 const toggleButton = getElementFromId('button-toggle-active');
 const contextToggleButton = getElementFromId('button-context-toggle-active');
+const topicsList = getElementFromId('words-section');
+const catagoriesList = getElementFromId('catagories-section');
 
 // Set up button state
 chrome.storage.local.get(KEYTOGGLE_KEY).then((result) => {
@@ -39,8 +42,15 @@ chrome.storage.local.get(WORDS_KEY).then((result) => {
   wordArray.forEach((element) => addWordToDisplay(element));
 });
 
-// element that represents the list of topics
-const topicsList = document.getElementsByClassName('container-words')[0];
+let catagoryObj = {};
+
+// load catagories
+chrome.storage.local.get(CATA_KEY).then((result) => {
+  catagoryObj = result.catagories;
+  console.log(catagoryObj);
+  const cataArray = Object.keys(catagoryObj);
+  cataArray.forEach((element) => addCatagoryToDisplay(element));
+});
 
 // Setup check
 chrome.storage.local.get(SETUP_KEY).then((result) => {
@@ -139,6 +149,51 @@ function addWordToDisplay(word) {
 }
 
 /**
+ * Adds a catagory to the display element.
+ * @param {string} word - the word to add
+ */
+function addCatagoryToDisplay(word) {
+  const containerElement = document.createElement('div');
+  const wordElement = document.createElement('div');
+  const removeIconContainerElement = document.createElement('div');
+
+  wordElement.innerText = word;
+  containerElement.classList.add('word-container');
+
+  removeIconContainerElement.classList.add('remove-icon-container');
+
+  // create toggle icon
+  const toggleElement = document.createElement('i');
+  toggleElement.classList.add('bi');
+  if (catagoryObj[word] == true) {
+    toggleElement.classList.add('bi-toggle-on');
+  } else {
+    toggleElement.classList.add('bi-toggle-off');
+  }
+
+  // delete element when trash icon is clicked
+  toggleElement.addEventListener('click', (e) => {
+    // flip state
+    toggleElement.classList.toggle('bi-toggle-on');
+    toggleElement.classList.toggle('bi-toggle-off');
+    // save toggle flip
+    toggleCatagoryFromObj(word);
+  });
+
+  // add icon to div container
+  removeIconContainerElement.appendChild(toggleElement);
+
+  // add both containers to main container
+  containerElement.appendChild(wordElement);
+  containerElement.appendChild(removeIconContainerElement);
+
+  // add assembled element to document
+  catagoriesList.prepend(containerElement);
+
+  console.debug('Added topics list display:', word);
+}
+
+/**
  * Removes a word from the display list.
  * @param {HTMLElement} element - element that contains the word to remove
  */
@@ -183,6 +238,17 @@ function toggleWordFromObj(word) {
   chrome.storage.local.set({keywords: wordsObj});
 
   logRestrictedWords();
+}
+
+/**
+ * Toggles catagory from storage
+ * @param {string} word - the word to toggle
+ */
+function toggleCatagoryFromObj(word) {
+  catagoryObj[word] = !catagoryObj[word];
+
+  // save updated obj to Chrome storage
+  chrome.storage.local.set({catagories: catagoryObj});
 }
 
 /**
@@ -271,6 +337,12 @@ getElementFromId('button-finish-setup').addEventListener('click', () => {
   sendListToBackend();
 });
 
+// 'Finish setup' button on topics screen completes setup
+getElementFromId('button-finish-catagories').addEventListener('click', () => {
+  hideSection(getElementFromId('section-catagories'));
+  showSection(getElementFromId('section-controls'));
+});
+
 // Censor Toggle On and Off button
 getElementFromId('button-toggle-active').addEventListener('click', () => {
   chrome.storage.local.get(KEYTOGGLE_KEY).then((result) => {
@@ -333,4 +405,11 @@ getElementFromId('button-open-settings').addEventListener('click', () => {
   hideSection(getElementFromId('section-controls'));
   showSection(getElementFromId('section-choice'));
   getElementFromId('section-choice-input').focus();
+});
+
+
+// 'Open settings' button on controls page
+getElementFromId('button-open-toxic-settings').addEventListener('click', () => {
+  hideSection(getElementFromId('section-controls'));
+  showSection(getElementFromId('section-catagories'));
 });
