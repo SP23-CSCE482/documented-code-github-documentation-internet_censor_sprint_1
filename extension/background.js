@@ -1,6 +1,3 @@
-import { ToxicityClassifier } from "./toxicity.js";
-
-
 const url = 'https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/related-words/';
 
 /**
@@ -28,7 +25,6 @@ async function wordsCall(word, sendResponse) {
   sendResponse({status: 'ok', words: array});
 }
 
-
 /**
  * Gets toxicity of input and sends result to caller
  * @param {string} inputString string to get toxicity
@@ -38,7 +34,6 @@ async function getToxicityAndReply(inputString, sendResponse) {
   const toxicityPrediction = await ToxicityClassifier.isToxic(inputString);
   sendResponse({ status: 'ok', result: toxicityPrediction });  
 }
-
 
 // listen for 'messages' from extension and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -125,14 +120,26 @@ chrome.runtime.onInstalled.addListener(() => {
     'murder': true,
     'suicide': true}; // Nothing wrong with literals
 
+  const initialCatagories = {
+    'identity attack': true,
+    'insult': true,
+    'obscene': true,
+    'severe toxicity': true,
+    'sexual explicit': true,
+    'threat': true,
+    'toxicity': true,
+  };
+
   chrome.storage.local.get('keywords', function(result) {
     if (result.keywords) { // defined
       console.log(result.keywords);
     } else { // uninitialised
       console.log('HERE');
       chrome.storage.local.set({keywords: initialWords});
+      chrome.storage.local.set({catagories: initialCatagories});
       chrome.storage.local.set({setup: true});
-      chrome.storage.local.set({toggle: false});
+      chrome.storage.local.set({keywordtoggle: false});
+      chrome.storage.local.set({contexttoggle: false});
     }
   });
   logStorage();
