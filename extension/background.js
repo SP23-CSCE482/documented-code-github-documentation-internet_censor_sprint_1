@@ -1,3 +1,6 @@
+import { ToxicityClassifier } from "./toxicity.js";
+
+
 const url = 'https://sic-ml-flask-835897784448932748-8zjyn.ondigitalocean.app/related-words/';
 
 /**
@@ -25,6 +28,7 @@ async function wordsCall(word, sendResponse) {
   sendResponse({status: 'ok', words: array});
 }
 
+
 /**
  * Gets toxicity of input and sends result to caller
  * @param {string} inputString string to get toxicity
@@ -34,6 +38,7 @@ async function getToxicityAndReply(inputString, sendResponse) {
   const toxicityPrediction = await ToxicityClassifier.isToxic(inputString);
   sendResponse({ status: 'ok', result: toxicityPrediction });  
 }
+
 
 // listen for 'messages' from extension and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
