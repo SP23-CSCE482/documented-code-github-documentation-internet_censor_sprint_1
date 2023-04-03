@@ -28,6 +28,18 @@ async function wordsCall(word, sendResponse) {
   sendResponse({status: 'ok', words: array});
 }
 
+
+/**
+ * Gets toxicity of input and sends result to caller
+ * @param {string} inputString string to get toxicity
+ * @param {*} sendResponse 
+ */
+async function getToxicityAndReply(inputString, sendResponse) {
+  const toxicityPrediction = await ToxicityClassifier.isToxic(inputString);
+  sendResponse({ status: 'ok', result: toxicityPrediction });  
+}
+
+
 // listen for 'messages' from extension and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.debug('Extension recieved message', request);
@@ -60,16 +72,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // handle message for toxicity prediction
     else if (request.msg_type === 'is_toxic' && 'input' in request.msg_content) {
-      const inputString = request.msg_content.input;
-      try {
-        ToxicityClassifier.isToxic(inputString).then(toxicityPrediction => {
-          console.log(toxicityPrediction);
-          sendResponse({ status: 'ok', result: toxicityPrediction });
-        });
-      } catch (error) {
-        console.error(error);
-        sendResponse({ status: 'failed' });
-      }
+      console.debug("Background script accepted message for toxicity prediction");
+      const inputString = request.msg_content.input;      
+      getToxicityAndReply(inputString, sendResponse);
+      return true;
     }
 
     // handle message that has required parts but contents are not valid

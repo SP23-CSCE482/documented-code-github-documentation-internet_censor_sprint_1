@@ -123,3 +123,15 @@ chrome.storage.local.get('toggle', function(result) {
 });
 
 
+// example of how to get toxicity
+setTimeout(async () => {
+  let testString = "Your string goes here";
+  
+  const response = await chrome.runtime.sendMessage({
+    msg_type: 'is_toxic',
+    msg_content: {input: testString},
+  });
+
+  console.debug('Toxicity result is', response);
+
+}, 5000);
