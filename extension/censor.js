@@ -2,7 +2,7 @@
  * Function to censor keywords on the web page.
  * @param {string[]} keywords - An array of keywords to be censored.
  */
-function censorKeywords(keywords) {
+async function censorKeywords(keywords) {
   // If the keywords array is empty, do not proceed with the censoring.
   if (keywords.length === 0) {
     return;
@@ -23,6 +23,20 @@ function censorKeywords(keywords) {
   for (let i = 0; i < textNodes.snapshotLength; i++) {
     const node = textNodes.snapshotItem(i);
     const textContent = node.textContent;
+
+//////////////////////////////////////////////////////////////////////////////
+    //Current working issue with text passing to toxicity model taking too long.
+    //Uncomment the following code:
+    // Check if the text node is toxic.
+    /*
+    const response = await chrome.runtime.sendMessage({
+      msg_type: 'is_toxic',
+      msg_content: {input: textContent},
+    });
+  
+    console.log('Toxicity result is', response, textContent);
+    */
+//////////////////////////////////////////////////////////////////////////////
 
     // Check if the text node contains any of the keywords to be censored.
     if (regex.test(textContent)) {
@@ -67,7 +81,7 @@ function debounce(func, wait) {
 function observeDOMChanges(keywords) {
   const debouncedCensorKeywords = debounce(() => {
     censorKeywords(keywords);
-  }, 1000); // Debounce time in milliseconds.
+  }, 300); // Debounce time in milliseconds.
 
   const observer = new MutationObserver(debouncedCensorKeywords);
 
