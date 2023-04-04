@@ -28,14 +28,15 @@ async function censorKeywords(keywords) {
     //Current working issue with text passing to toxicity model taking too long.
     //Uncomment the following code:
     // Check if the text node is toxic.
-    /*
-    const response = await chrome.runtime.sendMessage({
+
+    t1 = performance.now();
+    chrome.runtime.sendMessage({
       msg_type: 'is_toxic',
-      msg_content: {input: textContent},
-    });
-  
-    console.log('Toxicity result is', response, textContent);
-    */
+      msg_content: { input: textContent },
+    }).then(result => console.log(result));
+    t2 = performance.now();
+    console.log(t2 - t1);
+    
 //////////////////////////////////////////////////////////////////////////////
 
     // Check if the text node contains any of the keywords to be censored.
