@@ -174,7 +174,7 @@ function requestAndCensor() {
 
     // send message to extension with array of text
     chrome.runtime.sendMessage({
-        msg_type: 'is_toxic',
+        msg_type: 'is_toxic_batch',
         msg_content: { input: batch }
     }).then(results => {
 
