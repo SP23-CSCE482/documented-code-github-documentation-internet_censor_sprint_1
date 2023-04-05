@@ -25,18 +25,21 @@ async function wordsCall(word, sendResponse) {
   // Do request
   const array = await callToServer(urlrequest);
   console.log(array);
-  sendResponse({status: 'ok', words: array});
+  sendResponse({ status: 'ok', words: array });
 }
 
 
 /**
- * Gets toxicity of input and sends result to caller
- * @param {string} inputString string to get toxicity
- * @param {*} sendResponse 
+ * Does prediction of toxicity on array and replies to caller
+ * @param {*} inputArray - array of strings to check toxicity
+ * @param {*} sendResponse
  */
-async function getToxicityAndReply(inputString, sendResponse) {
-  const toxicityPrediction = await ToxicityClassifier.isToxic(inputString);
-  sendResponse({ status: 'ok', result: toxicityPrediction });  
+async function getBatchToxicityAndReply(inputArray, sendResponse) {
+  t1 = performance.now();
+  const toxicityPrediction = await ToxicityClassifier.getToxicityByBatch(inputArray);
+  t2 = performance.now();
+  console.debug("Model elapsed time:", t2 - t1);
+  sendResponse({ status: 'ok', result: toxicityPrediction });
 }
 
 
@@ -51,30 +54,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     // handle message that has topics list
     if ('list' in request.msg_content &&
-    request.msg_type == 'first_save_topics' &&
-    request.msg_content.list.length >= 1) {
+      request.msg_type == 'first_save_topics' &&
+      request.msg_content.list.length >= 1) {
       console.debug('Message has the topics list');
 
       // do something with topic list
       console.debug('Topics list is', request.msg_content.list);
 
       // send reply back to popup
-      sendResponse({status: 'ok'});
+      sendResponse({ status: 'ok' });
     }
 
     // handle message for related words server call
     else if ('word' in request.msg_content &&
-    request.msg_type == 'server_call') {
+      request.msg_type == 'server_call') {
       const word = request.msg_content.word;
       wordsCall(word, sendResponse);
+      return true;
+    }
+
+    // handle message for toxicity prediction batch
+    else if (request.msg_type === 'is_toxic_batch' && 'input' in request.msg_content) {
+      console.debug("Background script accepted message for toxicity prediction");
+      getBatchToxicityAndReply(request.msg_content.input, sendResponse);
       return true;
     }
 
     // handle message for toxicity prediction
     else if (request.msg_type === 'is_toxic' && 'input' in request.msg_content) {
       console.debug("Background script accepted message for toxicity prediction");
-      const inputString = request.msg_content.input;      
-      getToxicityAndReply(inputString, sendResponse);
+      getToxicityAndReply(request.msg_content.input, sendResponse);
       return true;
     }
 
@@ -87,7 +96,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else {
     // ignore all other messages
     console.error('Message is invalid');
-    sendResponse({status: 'failed'});
+    sendResponse({ status: 'failed' });
   }
 });
 
@@ -96,14 +105,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 function logStorage() {
   if (chrome.storage) {
-    chrome.storage.local.get(function(data) {
+    chrome.storage.local.get(function (data) {
       console.log('chrome.storage.local:');
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError);
       } else {
         console.log(data);
       }
-      chrome.storage.sync.get(function(data) {
+      chrome.storage.sync.get(function (data) {
         console.log('chrome.storage.sync:');
         if (chrome.runtime.lastError) {
           console.error(chrome.runtime.lastError);
@@ -123,7 +132,8 @@ chrome.runtime.onInstalled.addListener(() => {
   const initialWords = {
     'violence': true,
     'murder': true,
-    'suicide': true}; // Nothing wrong with literals
+    'suicide': true
+  }; // Nothing wrong with literals
 
   const initialCatagories = {
     'identity attack': true,
@@ -135,16 +145,16 @@ chrome.runtime.onInstalled.addListener(() => {
     'toxicity': true,
   };
 
-  chrome.storage.local.get('keywords', function(result) {
+  chrome.storage.local.get('keywords', function (result) {
     if (result.keywords) { // defined
       console.log(result.keywords);
     } else { // uninitialised
       console.log('HERE');
-      chrome.storage.local.set({keywords: initialWords});
-      chrome.storage.local.set({catagories: initialCatagories});
-      chrome.storage.local.set({setup: true});
-      chrome.storage.local.set({keywordtoggle: false});
-      chrome.storage.local.set({contexttoggle: false});
+      chrome.storage.local.set({ keywords: initialWords });
+      chrome.storage.local.set({ catagories: initialCatagories });
+      chrome.storage.local.set({ setup: true });
+      chrome.storage.local.set({ keywordtoggle: false });
+      chrome.storage.local.set({ contexttoggle: false });
     }
   });
   logStorage();

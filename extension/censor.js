@@ -151,3 +151,61 @@ setTimeout(async () => {
   console.debug('Toxicity result is', response);
 
 }, 5000);
+
+
+/* // example of censoring with batches
+
+function requestAndCensor() {
+    // get all elements from page that are p tags, do not have the redacted class, and do not have any child elements
+    // this will miss some elements, but good for now
+    let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*))'));
+
+    // keep only first 30 elements
+    inputElements = inputElements.slice(0, 30);
+
+    // save the text from each element
+    let batch = [];
+    for (let element of inputElements) {
+        batch.push(element.innerText);
+    }
+    console.assert(batch.length === inputElements.length);
+
+    performance.mark("before_sending_message");
+
+    // send message to extension with array of text
+    chrome.runtime.sendMessage({
+        msg_type: 'is_toxic',
+        msg_content: { input: batch }
+    }).then(results => {
+
+        performance.mark("message_recv");
+        console.log(performance.measure("Delay before recieving reply from extension", "before_sending_message", "message_recv"));
+
+        // only consider insults
+        const toxicity_type = 1;
+        let attack_results = results.result[toxicity_type].results;
+
+        // assert length of results is the same length as input
+        console.assert(inputElements.length === attack_results.length);
+
+        // loop over each result
+        for (let i = 0; i < attack_results.length; i++) {
+            let result = attack_results[i];
+
+            // if result was true, censor the corresponding element
+            if (result.match === true) {
+                const correspondingElement = inputElements[i];
+                const tempElement = document.createElement('span');
+                tempElement.className = 'redacted';
+                tempElement.innerText = '********';
+                correspondingElement.innerHTML = '';
+                correspondingElement.appendChild(tempElement);
+            }
+        }
+    });
+
+}
+
+requestAndCensor();
+
+*/
