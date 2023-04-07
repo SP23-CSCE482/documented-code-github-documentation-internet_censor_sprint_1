@@ -36,12 +36,16 @@
 
     <!-- section: lets the user pick initial topics -->
     <section id="section-choice">
-      <h1>Add keyword</h1>
-      <p>These keywords will be dynamically be removed from pages as you browse. Every keyword you add up to 10 associated words are found.</p>
-      <div class="container-words" id="words-section"></div>
-      <div class="horizontal-form-row">
-        <input type="text" class="form-control" id="section-choice-input" placeholder="Enter a topic">
-        <button type="button" class="btn btn-primary" id="button-add-word"><span>+</span></button>
+      <div class="filter-container">
+        <h1>Current Keywords</h1>
+        <p>These keywords will be censored from pages as you browse.</p>
+        <div class="container-words" id="words-section"></div>
+        <div class="horizontal-form-row">
+          <input type="text" class="form-control" id="section-choice-input" placeholder="Enter a topic">
+          <button type="button" class="btn btn-primary" id="button-add-word"><span>+</span></button>
+        </div>
+        <h3>Recommended Keywords:</h3>
+        <div class="container-words" id="rec-words-section"></div>
       </div>
       <button type="button" class="block-btn btn btn-primary" id="button-finish-setup">Finish setup</button>
     </section>

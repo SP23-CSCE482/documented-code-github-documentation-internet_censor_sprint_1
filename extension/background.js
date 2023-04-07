@@ -92,13 +92,13 @@ chrome.runtime.onInstalled.addListener(() => {
     'suicide': true}; // Nothing wrong with literals
 
   const initialCatagories = {
+    'toxicity': true,
+    'severe toxicity': true,
     'identity attack': true,
     'insult': true,
     'obscene': true,
-    'severe toxicity': true,
     'sexual explicit': true,
     'threat': true,
-    'toxicity': true,
   };
 
   chrome.storage.local.get('keywords', function(result) {

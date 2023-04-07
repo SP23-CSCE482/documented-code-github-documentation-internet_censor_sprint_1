@@ -9,10 +9,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 485px;
-    width: 350px;
-    max-height: 485px;
-    max-width: 350px;
+    height: 600px;
+    width: 400px;
 }
 
 main {
@@ -52,6 +50,11 @@ section h1 {
     line-height: 1.1;
     font-size: 30px;
     margin-top: 0;
+}
+
+section h3 {
+    font-weight: 600;
+    line-height: 1.1;
 }
 
 section p {
@@ -113,14 +116,21 @@ section p {
     margin-top: 30px;
 }
 
-#section-choice > .container-words {
+#section-choice > .filter-container {
+    margin-bottom: 10px;
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#section-choice > .filter-container > .container-words {
     margin-bottom: 10px;
     margin-top: 20px;
     max-height: 200px;
     overflow-y: auto;
 }
 
-#section-choice > .container-words > .word-container {
+#section-choice > .filter-container > .container-words > .word-container {
     background-color: var(--light-background);
     border-radius: 0.5rem;
     margin-bottom: 7px;
@@ -133,13 +143,13 @@ section p {
     cursor: default;
 }
 
-#section-choice > .container-words > .word-container > .remove-icon-container > i {
+#section-choice > .filter-container > .container-words > .word-container > .remove-icon-container > i {
     cursor: pointer;
     color: #b2b2b2;
     transition: color 0.1s linear;
 }
 
-#section-choice > .container-words > .word-container > .remove-icon-container > i:hover {
+#section-choice > .filter-container > .container-words > .word-container > .remove-icon-container > i:hover {
     color: #313131;
 }
 
