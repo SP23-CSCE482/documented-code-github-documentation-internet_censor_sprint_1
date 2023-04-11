@@ -4,7 +4,7 @@ import * as toxicity from '@tensorflow-models/toxicity';
 export class ToxicityClassifier {
     static TOXICITY_MODEL;
     static IS_MODEL_LOADED = false;
-    static TOXICITY_THRESHOLD = 0.7;
+    static TOXICITY_THRESHOLD = 0.1;
     static RECOMMENDED_MAX_BATCH_SIZE = 30;
 
     // load model
