@@ -6,7 +6,9 @@ const CONTOGGLE_KEY = 'contexttoggle';
 const toggleButton = getElementFromId('button-toggle-active');
 const contextToggleButton = getElementFromId('button-context-toggle-active');
 const topicsList = getElementFromId('words-section');
+const recList = getElementFromId('rec-words-section');
 const catagoriesList = getElementFromId('catagories-section');
+const recArray = [];
 
 // Set up button state
 chrome.storage.local.get(KEYTOGGLE_KEY).then((result) => {
@@ -89,7 +91,7 @@ function hideSection(element) {
 }
 
 /**
- * Adds a word to the display element.
+ * Adds a word to the keyword display element.
  * @param {string} word - the word to add
  */
 function addWordToDisplay(word) {
@@ -149,7 +151,61 @@ function addWordToDisplay(word) {
 }
 
 /**
- * Adds a catagory to the display element.
+ * Adds a recommend word to the recommended word element.
+ * @param {string} word - the word to add
+ */
+function addRecToDisplay(word) {
+  const containerElement = document.createElement('div');
+  const wordElement = document.createElement('div');
+  const removeIconContainerElement = document.createElement('div');
+
+  wordElement.innerText = word;
+  containerElement.classList.add('word-container');
+
+  removeIconContainerElement.classList.add('remove-icon-container');
+
+  // create delete icon
+  const deleteElement = document.createElement('i');
+  deleteElement.classList.add('bi', 'bi-x-lg');
+
+  // delete element when 'x' icon is clicked
+  deleteElement.addEventListener('click', (e) => {
+    const elementToDelete=e.target.parentElement.parentElement;
+    removeWordFromDisplay(elementToDelete);
+  });
+
+  // add icon to div container
+  removeIconContainerElement.appendChild(deleteElement);
+
+  // create check icon
+  const addElement = document.createElement('i');
+  addElement.classList.add('bi', 'bi-check2');
+
+  // add element when check icon is clicked
+  addElement.addEventListener('click', (e) => {
+    const elementToDelete=e.target.parentElement.parentElement;
+    removeWordFromDisplay(elementToDelete);
+    // Add to top list
+    saveWordToObj(word);
+    addWordToDisplay(word);
+    sendWordToBackend(word);
+  });
+
+  // add icon to div container
+  removeIconContainerElement.appendChild(addElement);
+
+  // add both containers to main container
+  containerElement.appendChild(wordElement);
+  containerElement.appendChild(removeIconContainerElement);
+
+  // add assembled element to document
+  recList.prepend(containerElement);
+
+  console.debug('Added topics list display:', word);
+}
+
+/**
+ * Adds a catagory to the catagory display element.
  * @param {string} word - the word to add
  */
 function addCatagoryToDisplay(word) {
@@ -305,9 +361,9 @@ async function sendWordToBackend(word) {
       const words = response.words;
       console.log(words);
       words.forEach((element) => {
-        if (!(element in keyDict)) {
-          saveWordToObj(element);
-          addWordToDisplay(element);
+        if (!(element in keyDict) && !(recArray.includes(element))) {
+          recArray.push(element);
+          addRecToDisplay(element);
         }
       });
     } else {
@@ -374,7 +430,7 @@ getElementFromId('button-context-toggle-active').addEventListener('click', () =>
     if (contextToggleButton.classList.contains('btn-danger')) {
       contextToggleButton.textContent = 'Disable Context Censor';
     } else {
-      conextToggleButton.textContent = 'Enable Context Censor';
+      contextToggleButton.textContent = 'Enable Context Censor';
     }
   });
 });
@@ -382,21 +438,35 @@ getElementFromId('button-context-toggle-active').addEventListener('click', () =>
 // 'Add' button on topics screen adds topic to list
 getElementFromId('button-add-word').addEventListener('click', () => {
   const inputValue = getElementFromId('section-choice-input').value;
+  // GET all current keys
+  let keyDict = {};
+  chrome.storage.local.get(WORDS_KEY).then((result) => {
+    keyDict = result.keywords;
+  });
   // Call to server (word)
-  saveWordToObj(inputValue);
-  addWordToDisplay(inputValue);
-  sendWordToBackend(inputValue);
-  getElementFromId('section-choice-input').value = '';
+  if (inputValue != '' && !(inputValue in keyDict)) {
+    saveWordToObj(inputValue);
+    addWordToDisplay(inputValue);
+    sendWordToBackend(inputValue);
+    getElementFromId('section-choice-input').value = '';
+  }
 });
 
 // make enter key add item to list
 getElementFromId('section-choice-input').addEventListener('keypress', (e) => {
   if (e.key=='Enter') {
     const inputValue = getElementFromId('section-choice-input').value;
-    saveWordToObj(inputValue);
-    addWordToDisplay(inputValue);
-    sendWordToBackend(inputValue);
-    getElementFromId('section-choice-input').value = '';
+    // GET all current keys
+    let keyDict = {};
+    chrome.storage.local.get(WORDS_KEY).then((result) => {
+      keyDict = result.keywords;
+    });
+    if (inputValue != '' && !(inputValue in keyDict)) {
+      saveWordToObj(inputValue);
+      addWordToDisplay(inputValue);
+      sendWordToBackend(inputValue);
+      getElementFromId('section-choice-input').value = '';
+    }
   }
 });
 

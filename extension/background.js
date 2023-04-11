@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // handle message for toxicity prediction
     else if (request.msg_type === 'is_toxic' && 'input' in request.msg_content) {
       console.debug("Background script accepted message for toxicity prediction");
-      getToxicityAndReply(request.msg_content.input, sendResponse);
+      //getToxicityAndReply(request.msg_content.input, sendResponse);
       return true;
     }
 
