@@ -4,6 +4,7 @@
  */
 async function censorKeywords(keywords) {
   // If the keywords array is empty, do not proceed with the censoring.
+  
   if (keywords.length === 0) {
     return;
   }
@@ -28,7 +29,7 @@ async function censorKeywords(keywords) {
     //Current working issue with text passing to toxicity model taking too long.
     //Uncomment the following code:
     // Check if the text node is toxic.
-
+/*
     t1 = performance.now();
     chrome.runtime.sendMessage({
       msg_type: 'is_toxic',
@@ -36,8 +37,9 @@ async function censorKeywords(keywords) {
     }).then(result => console.log(result));
     t2 = performance.now();
     console.log(t2 - t1);
-    
+*/  
 //////////////////////////////////////////////////////////////////////////////
+    //requestAndCensor();
 
     // Check if the text node contains any of the keywords to be censored.
     if (regex.test(textContent)) {
@@ -95,6 +97,7 @@ function observeDOMChanges(keywords) {
 }
 
 
+
 // Function to fetch keywords from chrome.storage and call the censorKeywords function.
 chrome.storage.local.get('keywordtoggle', function(result) {
   if (!result.keywordtoggle) {
@@ -138,6 +141,16 @@ chrome.storage.local.get('keywordtoggle', function(result) {
 });
 
 
+window.addEventListener('focus', () => {
+  chrome.storage.local.get('contexttoggle', function(result) {
+    if (!result.contexttoggle) {
+      requestAndCensor();
+    }
+  });
+});
+
+
+
 
 // example of how to get toxicity
 setTimeout(async () => {
@@ -153,59 +166,105 @@ setTimeout(async () => {
 }, 5000);
 
 
-/* // example of censoring with batches
+ // example of censoring with batches
 
-function requestAndCensor() {
-    // get all elements from page that are p tags, do not have the redacted class, and do not have any child elements
-    // this will miss some elements, but good for now
-    let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*))'));
+async function processBatch(batch, startIndex, inputElements, censoredMap, enabledCategories) {
+  const results = await chrome.runtime.sendMessage({
+    msg_type: 'is_toxic_batch',
+    msg_content: { input: batch }
+  });
 
-    // keep only first 30 elements
-    inputElements = inputElements.slice(0, 30);
+  for (let i = 0; i < batch.length; i++) {
+    const currentIndex = startIndex + i;
+    const correspondingElement = inputElements[currentIndex];
 
-    // save the text from each element
-    let batch = [];
-    for (let element of inputElements) {
-        batch.push(element.innerText);
+    // Check if the element has already been censored and skip it
+    if (censoredMap.get(correspondingElement)) {
+      continue;
     }
-    console.assert(batch.length === inputElements.length);
 
-    performance.mark("before_sending_message");
+    let shouldCensor = false;
 
-    // send message to extension with array of text
-    chrome.runtime.sendMessage({
-        msg_type: 'is_toxic_batch',
-        msg_content: { input: batch }
-    }).then(results => {
+    // loop over each enabled category
+    for (let j = 0; j < enabledCategories.length; j++) {
+      let attack_results = results.result[enabledCategories[j]].results;
+      let result = attack_results[i];
 
-        performance.mark("message_recv");
-        console.log(performance.measure("Delay before recieving reply from extension", "before_sending_message", "message_recv"));
+      if (result.match) {
+        shouldCensor = true;
+        break;
+      }
+    }
 
-        // only consider insults
-        const toxicity_type = 1;
-        let attack_results = results.result[toxicity_type].results;
+    // if shouldCensor is true, censor the corresponding element
+    if (shouldCensor) {
+      // Mark the element as censored in the censoredMap
+      censoredMap.set(correspondingElement, true);
 
-        // assert length of results is the same length as input
-        console.assert(inputElements.length === attack_results.length);
+      // Split the text content into sentences
+      const sentences = correspondingElement.innerText.match(/[^.!?]+[.!?]+(?:\s|$)/g) || [correspondingElement.innerText];
 
-        // loop over each result
-        for (let i = 0; i < attack_results.length; i++) {
-            let result = attack_results[i];
+      // Clear the original element's content
+      correspondingElement.innerHTML = '';
 
-            // if result was true, censor the corresponding element
-            if (result.match === true) {
-                const correspondingElement = inputElements[i];
-                const tempElement = document.createElement('span');
-                tempElement.className = 'redacted';
-                tempElement.innerText = '********';
-                correspondingElement.innerHTML = '';
-                correspondingElement.appendChild(tempElement);
-            }
-        }
-    });
+      // Iterate over the sentences and create a redacted span for each one
+      sentences.forEach(sentence => {
+          const tempElement = document.createElement('span');
+          tempElement.className = 'redacted';
+          tempElement.setAttribute('data-word', sentence);
+          tempElement.innerText = sentence;
+          correspondingElement.appendChild(tempElement);
+      });
+    }
 
+
+
+  }
 }
 
-requestAndCensor();
 
-*/
+async function requestAndCensor(enabledCategories) {
+  // Define the censoredMap
+  const censoredMap = new WeakMap();
+  // get all elements from page that are p tags, do not have the redacted class, and do not have any child elements
+  // this will miss some elements, but good for now
+  let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*)), h1:not(.redacted):not(:has(*)), h2:not(.redacted):not(:has(*)), h3:not(.redacted):not(:has(*)), h4:not(.redacted):not(:has(*)), h5:not(.redacted):not(:has(*)), h6:not(.redacted):not(:has(*)), li:not(.redacted):not(:has(*))'));
+
+
+  // Process each batch sequentially
+  for (let startIndex = 0; startIndex < inputElements.length; startIndex += 30) {
+    const batch = inputElements.slice(startIndex, startIndex + 30).map((element) => element.innerText);
+    await processBatch(batch, startIndex, inputElements, censoredMap, enabledCategories);
+  }
+}
+
+
+
+// Function to fetch contexttoggle and initialCatagories from chrome.storage and call the requestAndCensor function.
+chrome.storage.local.get(['contexttoggle', 'catagories'], async function(result) {
+  if (!result.contexttoggle) {
+    // Create a new object with key-value pairs set to true
+    const trueCatagories = Object.entries(result.catagories)
+      .filter(([key, value]) => value === true)
+      .reduce((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {});
+
+    console.log("Enabled categories: ", Object.keys(trueCatagories));
+    console.log("Enabled categories values: ", Object.values(trueCatagories));
+
+    // Get the index values of the keys that return true in catagories
+    const trueCatagoriesIndexes = Object.keys(result.catagories)
+      .map((key, index) => (result.catagories[key] === true ? index : -1))
+      .filter(index => index !== -1);
+
+    console.log("True categories indexes: ", trueCatagoriesIndexes);
+    await requestAndCensor(trueCatagoriesIndexes);
+  }
+});
+
+
+
+
+
