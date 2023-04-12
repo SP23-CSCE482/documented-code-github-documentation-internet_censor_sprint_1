@@ -152,24 +152,31 @@ window.addEventListener('focus', () => {
 
 
 
- // example of censoring with batches
+// Request and censor text elements with specified enabledCategories
+function requestAndCensor(enabledCategories) {
+  performance.mark("Starter"); // Start performance measurement
+  maxElements = 105; // Limit the number of elements processed
+  const batchSize = 10; // Processed batch size
+  const batchDelay = 20; // Add a delay between batches (in milliseconds)
 
- function requestAndCensor(enabledCategories) {
-  const maxElements = 105; // Limit the number of elements processed
-  const batchSize = 10; // Reduce the batch size
-  const batchDelay = 50; // Add a delay between batches (in milliseconds)
-
-  let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*))'));
+  // Select all text elements (p, h1, h2, h3, h4, h5, h6, li) that are not redacted and have no child elements
+  let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*)), h1:not(.redacted):not(:has(*)), h2:not(.redacted):not(:has(*)), h3:not(.redacted):not(:has(*)), h4:not(.redacted):not(:has(*)), h5:not(.redacted):not(:has(*)), h6:not(.redacted):not(:has(*)), li:not(.redacted):not(:has(*))'));
   console.log(inputElements.length);
+  // have maxElements equal to the length of elements in the document
+  maxElements = inputElements.length;
 
   inputElements = inputElements.slice(0, maxElements);
 
+  // Function to process a batch of elements starting from the given index
   function processBatch(startIndex) {
-    if (startIndex >= inputElements.length) return;
+    if (startIndex >= inputElements.length) return; // Exit if the startIndex is out of bounds
+    console.log("start Index", startIndex);
 
+    // Create a batch of elements to process
     const batch = inputElements.slice(startIndex, startIndex + batchSize).map((element) => element.innerText);
     console.assert(batch.length <= batchSize);
 
+    // Send a message to the background to check the toxicity of the batch
     chrome.runtime.sendMessage({
       msg_type: 'is_toxic_batch',
       msg_content: { input: batch }
@@ -179,9 +186,13 @@ window.addEventListener('focus', () => {
       let trueCategories = enabledCategories;
       let temp = results;
 
+      // Loop over each result in the batch
       for (let i = 0; i < attack_results.length; i++) {
+        // Check the enabledCategories for each result
         for (let j = 0; j < trueCategories.length; j++) {
           attack_results = temp.result[trueCategories[j]].results;
+
+          // If the text is toxic, censor it
           if (attack_results[i].match === true) {
             const correspondingElement = inputElements[startIndex + i];
             const tempElement = document.createElement('span');
@@ -197,12 +208,17 @@ window.addEventListener('focus', () => {
         }
       }
 
+      // Schedule the processing of the next batch after a delay
       setTimeout(() => processBatch(startIndex + batchSize), batchDelay);
     });
   }
 
+  // Start processing the batch
   processBatch(0);
+  performance.mark("Finisher"); // End performance measurement
+  console.log(performance.measure("Runntimer", "Starter", "Finisher")); // Log the performance measurement
 }
+
 
 
 //requestAndCensor();
@@ -220,10 +236,9 @@ chrome.storage.local.get(['contexttoggle', 'catagories'], function(result) {
       .filter(index => index !== -1);
     console.log("True categories indexes: ", trueCatagoriesIndexes);
     if (trueCatagoriesIndexes.length >= 1) {
-      performance.mark("Start");
+      
       requestAndCensor(trueCatagoriesIndexes);
-      performance.mark("Finish");
-      console.log(performance.measure("Runntime", "Start", "Finish"));
+      
     }
   }
 });
