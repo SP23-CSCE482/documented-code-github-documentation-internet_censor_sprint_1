@@ -4,7 +4,6 @@
  */
 async function censorKeywords(keywords) {
   // If the keywords array is empty, do not proceed with the censoring.
-  
   if (keywords.length === 0) {
     return;
   }
@@ -97,7 +96,6 @@ function observeDOMChanges(keywords) {
 }
 
 
-
 // Function to fetch keywords from chrome.storage and call the censorKeywords function.
 chrome.storage.local.get('keywordtoggle', function(result) {
   if (!result.keywordtoggle) {
@@ -152,119 +150,80 @@ window.addEventListener('focus', () => {
 
 
 
-// example of how to get toxicity
-setTimeout(async () => {
-  let testString = "Your string goes here";
-  
-  const response = await chrome.runtime.sendMessage({
-    msg_type: 'is_toxic',
-    msg_content: {input: testString},
-  });
-
-  console.debug('Toxicity result is', response);
-
-}, 5000);
 
 
  // example of censoring with batches
 
-async function processBatch(batch, startIndex, inputElements, censoredMap, enabledCategories) {
-  const results = await chrome.runtime.sendMessage({
-    msg_type: 'is_toxic_batch',
-    msg_content: { input: batch }
-  });
+ function requestAndCensor(enabledCategories) {
+  const maxElements = 105; // Limit the number of elements processed
+  const batchSize = 10; // Reduce the batch size
+  const batchDelay = 50; // Add a delay between batches (in milliseconds)
 
-  for (let i = 0; i < batch.length; i++) {
-    const currentIndex = startIndex + i;
-    const correspondingElement = inputElements[currentIndex];
+  let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*))'));
+  console.log(inputElements.length);
 
-    // Check if the element has already been censored and skip it
-    if (censoredMap.get(correspondingElement)) {
-      continue;
-    }
+  inputElements = inputElements.slice(0, maxElements);
 
-    let shouldCensor = false;
+  function processBatch(startIndex) {
+    if (startIndex >= inputElements.length) return;
 
-    // loop over each enabled category
-    for (let j = 0; j < enabledCategories.length; j++) {
-      let attack_results = results.result[enabledCategories[j]].results;
-      let result = attack_results[i];
+    const batch = inputElements.slice(startIndex, startIndex + batchSize).map((element) => element.innerText);
+    console.assert(batch.length <= batchSize);
 
-      if (result.match) {
-        shouldCensor = true;
-        break;
+    chrome.runtime.sendMessage({
+      msg_type: 'is_toxic_batch',
+      msg_content: { input: batch }
+    }).then(results => {
+      const toxicity_type = 1;
+      let attack_results = results.result[toxicity_type].results;
+      let trueCategories = enabledCategories;
+      let temp = results;
+
+      for (let i = 0; i < attack_results.length; i++) {
+        for (let j = 0; j < trueCategories.length; j++) {
+          attack_results = temp.result[trueCategories[j]].results;
+          if (attack_results[i].match === true) {
+            const correspondingElement = inputElements[startIndex + i];
+            const tempElement = document.createElement('span');
+            tempElement.className = 'redacted';
+
+            tempElement.setAttribute('data-word', correspondingElement.innerText);
+            tempElement.innerText = correspondingElement.innerText;
+
+            correspondingElement.innerHTML = '';
+            correspondingElement.appendChild(tempElement);
+            break;
+          }
+        }
       }
-    }
 
-    // if shouldCensor is true, censor the corresponding element
-    if (shouldCensor) {
-      // Mark the element as censored in the censoredMap
-      censoredMap.set(correspondingElement, true);
-
-      // Split the text content into sentences
-      const sentences = correspondingElement.innerText.match(/[^.!?]+[.!?]+(?:\s|$)/g) || [correspondingElement.innerText];
-
-      // Clear the original element's content
-      correspondingElement.innerHTML = '';
-
-      // Iterate over the sentences and create a redacted span for each one
-      sentences.forEach(sentence => {
-          const tempElement = document.createElement('span');
-          tempElement.className = 'redacted';
-          tempElement.setAttribute('data-word', sentence);
-          tempElement.innerText = sentence;
-          correspondingElement.appendChild(tempElement);
-      });
-    }
-
-
-
+      setTimeout(() => processBatch(startIndex + batchSize), batchDelay);
+    });
   }
+
+  processBatch(0);
 }
 
 
-async function requestAndCensor(enabledCategories) {
-  // Define the censoredMap
-  const censoredMap = new WeakMap();
-  // get all elements from page that are p tags, do not have the redacted class, and do not have any child elements
-  // this will miss some elements, but good for now
-  let inputElements = Array.from(document.querySelectorAll('p:not(.redacted):not(:has(*)), h1:not(.redacted):not(:has(*)), h2:not(.redacted):not(:has(*)), h3:not(.redacted):not(:has(*)), h4:not(.redacted):not(:has(*)), h5:not(.redacted):not(:has(*)), h6:not(.redacted):not(:has(*)), li:not(.redacted):not(:has(*))'));
+//requestAndCensor();
 
-
-  // Process each batch sequentially
-  for (let startIndex = 0; startIndex < inputElements.length; startIndex += 30) {
-    const batch = inputElements.slice(startIndex, startIndex + 30).map((element) => element.innerText);
-    await processBatch(batch, startIndex, inputElements, censoredMap, enabledCategories);
-  }
-}
 
 
 
 // Function to fetch contexttoggle and initialCatagories from chrome.storage and call the requestAndCensor function.
-chrome.storage.local.get(['contexttoggle', 'catagories'], async function(result) {
+chrome.storage.local.get(['contexttoggle', 'catagories'], function(result) {
   if (!result.contexttoggle) {
-    // Create a new object with key-value pairs set to true
-    const trueCatagories = Object.entries(result.catagories)
-      .filter(([key, value]) => value === true)
-      .reduce((obj, [key, value]) => {
-        obj[key] = value;
-        return obj;
-      }, {});
-
-    console.log("Enabled categories: ", Object.keys(trueCatagories));
-    console.log("Enabled categories values: ", Object.values(trueCatagories));
-
+    
     // Get the index values of the keys that return true in catagories
     const trueCatagoriesIndexes = Object.keys(result.catagories)
       .map((key, index) => (result.catagories[key] === true ? index : -1))
       .filter(index => index !== -1);
-
     console.log("True categories indexes: ", trueCatagoriesIndexes);
-    await requestAndCensor(trueCatagoriesIndexes);
+    if (trueCatagoriesIndexes.length >= 1) {
+      performance.mark("Start");
+      requestAndCensor(trueCatagoriesIndexes);
+      performance.mark("Finish");
+      console.log(performance.measure("Runntime", "Start", "Finish"));
+    }
   }
 });
-
-
-
-
-
