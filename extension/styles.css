@@ -1,7 +1,7 @@
 .redacted {
   color: black;
   background-color: black;
-  white-space: nowrap;
+  white-space: normal;
   transform: rotate(0.8deg) skewX(-12deg);
   box-shadow: 3px 0 2px #444;
   border: 1px dotted #555;
@@ -15,7 +15,7 @@
   background-color: rgba(255, 255, 255, 80%);
   padding: 0 5px;
   border-radius: 5px;
-  white-space: nowrap;
+  white-space: normal;
   z-index: 1000;
   top: -25px;
   left: 0;
