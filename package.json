@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint --ignore-path .gitignore --fix --ext .js .",
-    "test": "jest",
+    "test": "jest --coverage",
     "css-lint": "npx stylelint \"**/*.css\"",
     "build-dev": "parcel build --config @parcel/config-webextension --no-source-maps --no-optimize",
     "build-dist": "parcel build --config @parcel/config-webextension --no-source-maps",
