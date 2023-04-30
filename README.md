@@ -1,4 +1,4 @@
-# Safe Internet Coalition README
+# Safe Internet Coalition README 
 
 ## Introduction
 
