@@ -1,46 +1,46 @@
+#!/usr/bin/env python3
+
 import subprocess
 import os
 import logging
-from embeddings import GloveEmbedding
+from preset_variables import EMBED_DIMENSION, GLOVE_DATA_FILE_URL
 
 
-os.makedirs(os.environ["EMBEDDINGS_ROOT"], exist_ok=True)
-logging.info("Created embeddings directory.")
+def main():
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.DEBUG)
 
-current_info = GloveEmbedding.settings
-current_settings = current_info[os.environ["GLOVE_MODEL_NAME"]]
-current_info[os.environ["GLOVE_MODEL_NAME"]] = GloveEmbedding.GloveSetting(
-    os.environ["GLOVE_DATA_FILE_URL"],
-    current_settings.d_embs,
-    current_settings.size,
-    current_settings.description,
-)
-logging.info("Replaced URL in GloveEmbedding setting.")
+    subprocess.run(
+        [
+            "wget",
+            "--no-verbose",
+            "--tries",
+            "3",
+            "--https-only",
+            "--no-clobber",
+            "--output-document",
+            "glove.zip",
+            GLOVE_DATA_FILE_URL,
+        ],
+        check=True,
+        timeout=60 * 20,
+    )
+    logger.info("Done downloading the data file.")
 
-logging.info("Starting embeddings download...")
-GloveEmbedding(
-    os.environ["GLOVE_MODEL_NAME"],
-    d_emb=int(os.environ["GLOVE_MODEL_EMBEDDINGS_DIMENSION"]),
-    show_progress=False,
-)
-logging.info("Embeddings download finished.")
+    subprocess.run(
+        [
+            "unzip",
+            "glove.zip",
+            f"glove.6B.{EMBED_DIMENSION}d.txt",
+        ],
+        check=True,
+        timeout=60 * 20,
+    )
+    logger.info("Done unzipping.")
 
-logging.info("Downloading word list...")
-subprocess.run(
-    [
-        "wget",
-        "--no-verbose",
-        "-t",
-        "3",
-        "-O",
-        "word_list.txt",
-        os.environ["ENGLISH_WORD_LIST_FILE_URL"],
-    ],
-    check=True,
-    timeout=120,
-)
-logging.info("Done downloading the word list.")
+    os.remove("glove.zip")
+    logger.info("Deleted unused zip file.")
 
-os.remove(
-    os.environ["EMBEDDINGS_ROOT"] + "/glove/" + os.environ["GLOVE_MODEL_NAME"] + ".zip"
-)
+
+if __name__ == "__main__":
+    main()
