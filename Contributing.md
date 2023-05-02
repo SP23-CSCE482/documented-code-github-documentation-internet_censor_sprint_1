@@ -40,4 +40,4 @@ Pull requests are the best way to propose changes to the codebase (we use [Githu
 
 
 ## References
-This document was adapted from the open-source contribution guidelines of [briandk](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62)
+This document was adapted from the open-source contribution guidelines of [briandk and Facebook's open source guidlines](https://gist.github.com/briandk/3d2e8b3ec8daf5a27a62).
