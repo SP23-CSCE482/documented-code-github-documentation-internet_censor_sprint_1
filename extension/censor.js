@@ -24,11 +24,11 @@ async function censorKeywords(keywords) {
     const node = textNodes.snapshotItem(i);
     const textContent = node.textContent;
 
-//////////////////////////////////////////////////////////////////////////////
-    //Current working issue with text passing to toxicity model taking too long.
-    //Uncomment the following code:
+    // ////////////////////////////////////////////////////////////////////////////
+    // Current working issue with text passing to toxicity model taking too long.
+    // Uncomment the following code:
     // Check if the text node is toxic.
-/*
+    /*
     t1 = performance.now();
     chrome.runtime.sendMessage({
       msg_type: 'is_toxic',
@@ -36,9 +36,9 @@ async function censorKeywords(keywords) {
     }).then(result => console.log(result));
     t2 = performance.now();
     console.log(t2 - t1);
-*/  
-//////////////////////////////////////////////////////////////////////////////
-    //requestAndCensor();
+*/
+    // ////////////////////////////////////////////////////////////////////////////
+    // requestAndCensor();
 
     // Check if the text node contains any of the keywords to be censored.
     if (regex.test(textContent)) {
@@ -148,13 +148,14 @@ window.addEventListener('focus', () => {
 });
 
 
-
-
-
-
-// Request and censor text elements with specified enabledCategories
+/**
+* Requests and censors text elements with specified enabledCategories.
+* Processes a given number of text elements in batches with a delay between them.
+* @function
+* @param {Array<number>} enabledCategories - Array of enabled category indices to be checked for toxicity.
+*/
 function requestAndCensor(enabledCategories) {
-  performance.mark("Starter"); // Start performance measurement
+  performance.mark('Starter'); // Start performance measurement
   maxElements = 105; // Limit the number of elements processed
   const batchSize = 10; // Processed batch size
   const batchDelay = 20; // Add a delay between batches (in milliseconds)
@@ -167,10 +168,15 @@ function requestAndCensor(enabledCategories) {
 
   inputElements = inputElements.slice(0, maxElements);
 
-  // Function to process a batch of elements starting from the given index
+  /**
+   * Processes a batch of elements starting from the given index.
+   * Sends a message to the background to check the toxicity of the batch.
+   * If the text is toxic, censor it.
+   * @param {number} startIndex - The starting index for the batch to be processed.
+   */
   function processBatch(startIndex) {
     if (startIndex >= inputElements.length) return; // Exit if the startIndex is out of bounds
-    console.log("start Index", startIndex);
+    console.log('start Index', startIndex);
 
     // Create a batch of elements to process
     const batch = inputElements.slice(startIndex, startIndex + batchSize).map((element) => element.innerText);
@@ -179,12 +185,12 @@ function requestAndCensor(enabledCategories) {
     // Send a message to the background to check the toxicity of the batch
     chrome.runtime.sendMessage({
       msg_type: 'is_toxic_batch',
-      msg_content: { input: batch }
-    }).then(results => {
+      msg_content: {input: batch},
+    }).then((results) => {
       const toxicity_type = 1;
       let attack_results = results.result[toxicity_type].results;
-      let trueCategories = enabledCategories;
-      let temp = results;
+      const trueCategories = enabledCategories;
+      const temp = results;
 
       // Loop over each result in the batch
       for (let i = 0; i < attack_results.length; i++) {
@@ -215,30 +221,24 @@ function requestAndCensor(enabledCategories) {
 
   // Start processing the batch
   processBatch(0);
-  performance.mark("Finisher"); // End performance measurement
-  console.log(performance.measure("Runntimer", "Starter", "Finisher")); // Log the performance measurement
+  performance.mark('Finisher'); // End performance measurement
+  console.log(performance.measure('Runntimer', 'Starter', 'Finisher')); // Log the performance measurement
 }
 
 
-
-//requestAndCensor();
-
-
+// requestAndCensor();
 
 
 // Function to fetch contexttoggle and initialCatagories from chrome.storage and call the requestAndCensor function.
 chrome.storage.local.get(['contexttoggle', 'catagories'], function(result) {
   if (!result.contexttoggle) {
-    
     // Get the index values of the keys that return true in catagories
     const trueCatagoriesIndexes = Object.keys(result.catagories)
-      .map((key, index) => (result.catagories[key] === true ? index : -1))
-      .filter(index => index !== -1);
-    console.log("True categories indexes: ", trueCatagoriesIndexes);
+        .map((key, index) => (result.catagories[key] === true ? index : -1))
+        .filter((index) => index !== -1);
+    console.log('True categories indexes: ', trueCatagoriesIndexes);
     if (trueCatagoriesIndexes.length >= 1) {
-      
       requestAndCensor(trueCatagoriesIndexes);
-      
     }
   }
 });
