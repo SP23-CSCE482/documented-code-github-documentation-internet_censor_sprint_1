@@ -190,4 +190,4 @@ A CI pipeline has been created for this repo. This involves running the linter a
 
 ## Contribution Guide
 
-If you are interested in contributing and improving Safe Internet Coaltion, please take a look at our [Contribution Guide](https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1/blob/main/CONTRIBUTING.md).
+If you are interested in contributing and improving Safe Internet Coaltion, please take a look at our [Contribution Guide](https://github.com/SP23-CSCE482/documented-code-github-documentation-internet_censor_sprint_1/blob/main/CONTRIBUTING.md).
