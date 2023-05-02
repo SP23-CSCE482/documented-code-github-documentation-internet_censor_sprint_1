@@ -44,7 +44,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     extensionPage.click('#button-default-setup');
     const section = await extensionPage.$('#section-controls');
     const heading = await section.$('h1');
@@ -62,7 +62,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-controls');
     const button2 = await section.$('button-toggle-active');
     expect(button2).toBeDefined();
@@ -78,7 +78,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-controls');
     const button1 = await section.$('button-context-toggle-active');
     expect(button1).toBeDefined();
@@ -94,7 +94,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-controls');
     const button3 = await section.$('button-open-settings');
     const button4 = await section.$('button-open-toxic-settings');
@@ -112,7 +112,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-controls');
     const button1 = await section.$('#button-context-toggle-active');
     const button1text = await button1.getProperty('.btn-success');
@@ -132,7 +132,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-controls');
     extensionPage.click('#button-context-toggle-active');
     extensionPage.click('#button-toggle-active');
@@ -155,7 +155,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     await extensionPage.click('#button-open-toxic-settings');
     await extensionPage.click('#button-finish-catagories');
     const section = await extensionPage.$('#section-controls');
@@ -174,7 +174,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-controls');
     const button1 = await section.$('#button-context-toggle-active');
     const button1text = await button1.getProperty('.btn-success');

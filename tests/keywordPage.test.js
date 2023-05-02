@@ -16,7 +16,7 @@ describe('Test browser extension', () => {
     extensionPage = extensionEnvironment.extensionPage;
   });
 
-
+  
   afterAll(async () => {
     await browser.close();
   });
@@ -47,7 +47,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     extensionPage.click('#button-continue-setup');
     const section = await extensionPage.$('#section-choice');
     const heading = await section.$('h1');
@@ -65,11 +65,11 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const filterCon = await section.$('.filter-container');
     const wordsCon = await filterCon.$('#words-section');
-
+    
     expect(filterCon).toBeDefined();
     expect(wordsCon).toBeDefined();
   });
@@ -84,11 +84,11 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const filterCon = await section.$('.filter-container');
     const recWordsCon = await filterCon.$('#rec-words-section');
-
+    
     expect(filterCon).toBeDefined();
     expect(recWordsCon).toBeDefined();
   });
@@ -103,7 +103,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const filterCon = await section.$('.filter-container');
     const wordsCon = await filterCon.$('#words-section');
@@ -122,7 +122,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const filterCon = await section.$('.filter-container');
     const wordsCon = await filterCon.$('#words-section');
@@ -141,7 +141,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const filterCon = await section.$('.filter-container');
     const wordsCon = await filterCon.$('#words-section');
@@ -160,7 +160,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const addArea = await section.$('#section-choice-input');
 
@@ -177,7 +177,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const button = await section.$('#button-add-word');
 
@@ -204,8 +204,8 @@ describe('Test browser extension', () => {
     await extensionPage.click('#button-add-word');
 
     const text = await extensionPage.evaluate(() => {
-      const tag = document.querySelector('#section-choice-input');
-      return tag.textContent;
+        const tag = document.querySelector('#section-choice-input');
+        return tag.textContent;
     });
 
     expect(text).not.toEqual('death');
@@ -222,7 +222,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const section = await extensionPage.$('#section-choice');
     const filterCon = await section.$('.filter-container');
     const wordsCon = await filterCon.$('#rec-words-section');
@@ -241,10 +241,10 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
+    
+    var chk = 'Failed';
 
-    let chk = 'Failed';
-
-    if ((await extensionPage.waitForXPath('//*[contains(text(), "deaths")]', 300)) !== null) {
+    if ((await extensionPage.waitForXPath('//*[contains(text(), "deaths")]',300)) !== null) {
       chk = 'Success';
     }
 
@@ -261,10 +261,10 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
+    
+    var chk = 'Failed';
 
-    let chk = 'Failed';
-
-    if ((await extensionPage.waitForXPath('//*[contains(text(), "death")]', 300)) !== null) {
+    if ((await extensionPage.waitForXPath('//*[contains(text(), "death")]',300)) !== null) {
       chk = 'Success';
     }
 
@@ -281,8 +281,8 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
-    let chk = 'Failure';
+    
+    var chk = 'Failure';
 
     try {
       const obj = await extensionPage.$('.word-container');
@@ -290,7 +290,7 @@ describe('Test browser extension', () => {
       await trash.click();
       chk = 'Success';
     } catch {}
-
+    
 
     expect(chk).toEqual('Success');
   });
@@ -305,8 +305,8 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
-    let chk = 'Failure';
+    
+    var chk = 'Failure';
 
     try {
       const obj = await extensionPage.$('.word-container');
@@ -314,7 +314,7 @@ describe('Test browser extension', () => {
       await toggle.click();
       chk = 'Success';
     } catch {}
-
+    
 
     expect(chk).toEqual('Success');
   });
@@ -329,10 +329,10 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const toggleOn = await extensionPage.$('.bi-toggle-on');
     const toggleOff = await extensionPage.$('.bi-toggle-off');
-
+    
     expect(toggleOff).toBeDefined();
     expect(toggleOn).toBeDefined();
   });
@@ -347,9 +347,9 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const button = await extensionPage.$('#button-finish-setup');
-
+    
     expect(button).toBeDefined();
   });
 
@@ -363,9 +363,9 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const reject = await extensionPage.$('.bi-x-lg');
-
+    
     expect(reject).toBeDefined();
   });
 
@@ -379,9 +379,9 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const accept = await extensionPage.$('.bi-check2');
-
+    
     expect(accept).toBeDefined();
   });
 
@@ -395,15 +395,15 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
 
-    let chk = 'Failure';
+    var chk = 'Failure';
 
     try {
       await extensionPage.bringToFront();
       await extensionPage.click('.bi-x-lg');
       chk = 'Success';
     } catch {}
-
-
+    
+    
     expect(chk).toEqual('Success');
   });
 
@@ -417,15 +417,15 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
 
-    let chk = 'Failure';
+    var chk = 'Failure';
 
     try {
       await extensionPage.bringToFront();
       await extensionPage.click('.bi-check2');
       chk = 'Success';
     } catch {}
-
-
+    
+    
     expect(chk).toEqual('Success');
   });
 
@@ -439,7 +439,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     await extensionPage.click('#button-finish-setup');
     const section = await extensionPage.$('#section-controls');
     const heading = await section.$('h1');
@@ -457,7 +457,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     extensionPage.click('#button-open-settings');
     const section = await extensionPage.$('#section-choice');
     const heading = await section.$('h1');
@@ -475,10 +475,10 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-
+    
     const toggleOn = await extensionPage.$('.bi-toggle-on');
     const toggleOff = await extensionPage.$('.bi-toggle-off');
-
+    
     expect(toggleOff).toBeDefined();
     expect(toggleOn).toBeDefined();
   });
@@ -493,10 +493,10 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
+    
+    var chk = 'Failed';
 
-    let chk = 'Failed';
-
-    if ((await extensionPage.waitForXPath('//*[contains(text(), "war")]', 300)) !== null) {
+    if ((await extensionPage.waitForXPath('//*[contains(text(), "war")]',300)) !== null) {
       chk = 'Success';
     }
 
@@ -513,14 +513,15 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-    let chk = 'Failed';
+    var chk = 'Failed';
 
     try {
-      await extensionPage.waitForXPath('//div[@class="words-container"]/*[contains(text(), "death")]', 300);
+      await extensionPage.waitForXPath('//div[@class="words-container"]/*[contains(text(), "death")]',300);
     } catch {
       chk = 'Success';
     }
 
     expect(chk).toEqual('Success');
   });
+
 });
