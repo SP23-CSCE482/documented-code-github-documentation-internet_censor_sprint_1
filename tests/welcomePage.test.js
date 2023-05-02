@@ -16,7 +16,7 @@ describe('Test browser extension', () => {
     extensionPage = extensionEnvironment.extensionPage;
   });
 
-  
+
   afterAll(async () => {
     await browser.close();
   });
@@ -47,7 +47,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-    
+
     const button = await extensionPage.$('#button-default-setup');
     expect(button).toBeDefined();
   });
@@ -62,7 +62,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-    
+
     const button = await extensionPage.$('#button-continue-setup');
     expect(button).toBeDefined();
   });

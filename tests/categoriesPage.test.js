@@ -44,7 +44,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-    
+
     await extensionPage.click('#button-default-setup');
     await extensionPage.click('#button-open-toxic-settings');
     const h1 = await extensionPage.$x('//h1[contains(text(),"Categories")]');
@@ -115,7 +115,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-    
+
     const section = await extensionPage.$('#section-catagories');
     const catagories = await section.$('#catagories-section');
     const category = await catagories.$('.word-container');
@@ -150,7 +150,7 @@ describe('Test browser extension', () => {
     // Use extensionPage to interact with the extension's popup
     // First, activate the popup
     await extensionPage.bringToFront();
-    
+
     await extensionPage.click('#button-finish-catagories');
     await extensionPage.click('#button-open-toxic-settings');
     const h1 = await extensionPage.$x('//h1[contains(text(),"Categories")]');
