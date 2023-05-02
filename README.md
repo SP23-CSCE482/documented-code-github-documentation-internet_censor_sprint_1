@@ -25,6 +25,7 @@ The Safe Internet Coalition presents a Google Chrome browser extension for conte
         - LRU cache
         - Logging
 - CI/CD
+- Contribution Guide
 
 # Instructions for end-users
 
@@ -186,3 +187,7 @@ All aspects of the application use Python's `logging` facility throughout to cap
 ## CI/CD
 
 A CI pipeline has been created for this repo. This involves running the linter and test cases after every commit. For more information, check [GitHub Actions](https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1/actions).
+
+## Contribution Guide
+
+If you are interested in contributing and improving Safe Internet Coaltion, please take a look at our [Contribution Guide](https://github.com/SP23-CSCE482/github-setup-internet_censor_sprint_1/blob/main/CONTRIBUTING.md).
